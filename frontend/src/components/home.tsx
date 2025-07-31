@@ -1,61 +1,58 @@
 import React, { useState } from "react";
-import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
-import toast from 'react-hot-toast';
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  PlusCircle,
-  ChevronRight,
-  Loader2,
-} from "lucide-react";
+import { PlusCircle, ChevronRight, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { complianceAPI, documentsAPI } from "@/lib/api";
 import ComplianceProgressTracker from "./ComplianceProgressTracker";
 import DocumentGrid from "./DocumentGrid";
 import DocumentViewModal from "./documents/DocumentViewModal";
+import CreateDocumentModal from "./documents/CreateDocumentModal";
 
 const Home = () => {
   const { user, logout } = useAuth();
-  const [selectedFramework, setSelectedFramework] = useState<string>('all');
-  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
+  const [selectedFramework, setSelectedFramework] = useState<string>("all");
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(
+    null
+  );
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Fetch compliance progress
   const { data: complianceProgress, isLoading: progressLoading } = useQuery({
-    queryKey: ['compliance-progress'],
+    queryKey: ["compliance-progress"],
     queryFn: complianceAPI.getProgress,
     onError: (error: any) => {
-      toast.error('Failed to load compliance progress');
-      console.error('Compliance progress error:', error);
+      toast.error("Failed to load compliance progress");
+      console.error("Compliance progress error:", error);
     },
   });
 
   // Fetch frameworks
   const { data: frameworks, isLoading: frameworksLoading } = useQuery({
-    queryKey: ['frameworks'],
+    queryKey: ["frameworks"],
     queryFn: complianceAPI.getFrameworks,
     onError: (error: any) => {
-      toast.error('Failed to load frameworks');
-      console.error('Frameworks error:', error);
+      toast.error("Failed to load frameworks");
+      console.error("Frameworks error:", error);
     },
   });
 
   // Fetch documents
   const { data: documents, isLoading: documentsLoading } = useQuery({
-    queryKey: ['documents', selectedFramework],
+    queryKey: ["documents", selectedFramework],
     queryFn: () => {
-      const frameworkId = selectedFramework === 'all' ? undefined : selectedFramework;
+      const frameworkId =
+        selectedFramework === "all" ? undefined : selectedFramework;
       return documentsAPI.getAll(frameworkId);
     },
     onError: (error: any) => {
-      toast.error('Failed to load documents');
-      console.error('Documents error:', error);
+      toast.error("Failed to load documents");
+      console.error("Documents error:", error);
     },
   });
 
@@ -63,7 +60,7 @@ const Home = () => {
     try {
       await logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     }
   };
 
@@ -100,7 +97,10 @@ const Home = () => {
         className="space-y-6"
       >
         {/* Dashboard Header */}
-        <motion.div variants={itemVariants} className="flex flex-col md:flex-row items-start justify-between">
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col md:flex-row items-start justify-between"
+        >
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
               Welcome back, {user?.firstName}! 👋
@@ -163,8 +163,8 @@ const Home = () => {
                   </CardContent>
                 </Card>
               ) : (
-                <DocumentGrid 
-                  documents={documents || []} 
+                <DocumentGrid
+                  documents={documents || []}
                   onDocumentClick={handleDocumentClick}
                 />
               )}
@@ -181,6 +181,12 @@ const Home = () => {
           setIsDocumentModalOpen(false);
           setSelectedDocumentId(null);
         }}
+      />
+
+      <CreateDocumentModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        organizationId="default-org-id"
       />
     </>
   );
