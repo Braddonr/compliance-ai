@@ -203,23 +203,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           >
             <Maximize2 className="h-4 w-4" />
           </Button>
-          {onToggleExpand && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={onToggleExpand}
-              title={isExpanded ? 'Minimize editor' : 'Expand editor'}
-            >
-              {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-            </Button>
-          )}
         </div>
       )}
       <EditorContent
         editor={editor}
-        className={`prose prose-sm max-w-none p-4 focus:outline-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:mb-4 prose-ul:mb-4 prose-ol:mb-4 prose-li:mb-1 prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic ${
-          isExpanded ? 'min-h-[60vh]' : 'min-h-[200px]'
+        className={`prose prose-sm max-w-none p-4 focus:outline-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:mb-4 prose-ul:mb-4 prose-ol:mb-4 prose-li:mb-1 prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic overflow-y-auto ${
+          isExpanded ? 'h-full min-h-[calc(100vh-200px)]' : 'min-h-[200px]'
         }`}
       />
     </div>

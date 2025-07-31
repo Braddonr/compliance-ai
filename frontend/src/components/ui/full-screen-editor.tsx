@@ -164,15 +164,18 @@ const FullScreenEditor: React.FC<FullScreenEditorProps> = ({
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="flex-1 h-[calc(100vh-80px)] p-4"
+            className="flex-1 overflow-auto p-4"
+            style={{ height: 'calc(100vh - 80px)' }}
           >
-            <div className="h-full max-w-4xl mx-auto">
-              <RichTextEditor
-                content={localContent}
-                onChange={handleContentChange}
-                placeholder="Start writing your compliance document..."
-                isExpanded={true}
-              />
+            <div className="h-full max-w-4xl mx-auto flex flex-col">
+              <div className="flex-1 overflow-auto">
+                <RichTextEditor
+                  content={localContent}
+                  onChange={handleContentChange}
+                  placeholder="Start writing your compliance document..."
+                  isExpanded={true}
+                />
+              </div>
             </div>
           </motion.div>
 
