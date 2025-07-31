@@ -320,6 +320,9 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
                           placeholder="Start writing your compliance document..."
                           isExpanded={isEditorExpanded}
                           onToggleExpand={() => setIsEditorExpanded(!isEditorExpanded)}
+                          title={watch('title') || 'New Document'}
+                          framework={frameworks?.find(f => f.id === watchedFramework)?.displayName}
+                          isAIGenerated={false}
                         />
                         {errors.content && (
                           <p className="text-sm text-red-500">{errors.content.message}</p>
@@ -509,6 +512,9 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
                             placeholder="AI-generated content will appear here..."
                             isExpanded={isEditorExpanded}
                             onToggleExpand={() => setIsEditorExpanded(!isEditorExpanded)}
+                            title={watch('title') || 'New Document'}
+                            framework={frameworks?.find(f => f.id === watchedFramework)?.displayName}
+                            isAIGenerated={true}
                           />
                           <p className="text-xs text-muted-foreground">
                             💡 Tip: You can edit the content above to customize it further before saving. Click the expand icon to get more editing space.

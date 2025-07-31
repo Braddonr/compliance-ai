@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
 import { Button } from './button';
+import FullScreenEditor from './full-screen-editor';
 import {
   Bold,
   Italic,
@@ -28,6 +29,10 @@ interface RichTextEditorProps {
   editable?: boolean;
   isExpanded?: boolean;
   onToggleExpand?: () => void;
+  onFullScreenEdit?: (content: string) => void;
+  title?: string;
+  framework?: string;
+  isAIGenerated?: boolean;
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
@@ -37,7 +42,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   editable = true,
   isExpanded = false,
   onToggleExpand,
+  onFullScreenEdit,
+  title = 'Document Editor',
+  framework,
+  isAIGenerated = false,
 }) => {
+  const [isFullScreenOpen, setIsFullScreenOpen] = useState(false);
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -66,8 +76,20 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
+  const handleFullScreenEdit = () => {
+    setIsFullScreenOpen(true);
+  };
+
+  const handleFullScreenSave = (newContent: string) => {
+    onChange(newContent);
+    if (onFullScreenEdit) {
+      onFullScreenEdit(newContent);
+    }
+  };
+
   return (
-    <div className="border rounded-lg overflow-hidden">
+    <>
+      <div className="border rounded-lg overflow-hidden">
       {editable && (
         <div className="border-b p-2 flex flex-wrap gap-1 bg-muted/50">
           <Button
@@ -170,19 +192,27 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           >
             <Redo className="h-4 w-4" />
           </Button>
+          <div className="border-l mx-2" />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleFullScreenEdit}
+            title="Full screen editor"
+            className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 hover:from-blue-600/20 hover:to-purple-600/20"
+          >
+            <Maximize2 className="h-4 w-4" />
+          </Button>
           {onToggleExpand && (
-            <>
-              <div className="border-l mx-2" />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={onToggleExpand}
-                title={isExpanded ? 'Minimize editor' : 'Expand editor'}
-              >
-                {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-              </Button>
-            </>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onToggleExpand}
+              title={isExpanded ? 'Minimize editor' : 'Expand editor'}
+            >
+              {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            </Button>
           )}
         </div>
       )}
@@ -193,6 +223,19 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         }`}
       />
     </div>
+
+    {/* Full Screen Editor */}
+    <FullScreenEditor
+      isOpen={isFullScreenOpen}
+      onClose={() => setIsFullScreenOpen(false)}
+      content={content}
+      onChange={onChange}
+      onSave={handleFullScreenSave}
+      title={title}
+      framework={framework}
+      isAIGenerated={isAIGenerated}
+    />
+  </>
   );
 };
 
