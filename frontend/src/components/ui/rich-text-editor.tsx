@@ -89,9 +89,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   return (
     <>
-      <div className="border rounded-lg overflow-hidden">
+      <div className="border rounded-lg overflow-hidden flex flex-col h-full">
       {editable && (
-        <div className="border-b p-2 flex flex-wrap gap-1 bg-muted/50">
+        <div className="sticky top-0 z-10 border-b p-2 flex flex-wrap gap-1 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-sm">
           <Button
             type="button"
             variant="ghost"
@@ -205,12 +205,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           </Button>
         </div>
       )}
-      <EditorContent
-        editor={editor}
-        className={`prose prose-sm max-w-none p-4 focus:outline-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:mb-4 prose-ul:mb-4 prose-ol:mb-4 prose-li:mb-1 prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic overflow-y-auto ${
-          isExpanded ? 'h-full min-h-[calc(100vh-200px)]' : 'min-h-[200px]'
-        }`}
-      />
+      <div className="flex-1 overflow-y-auto">
+        <EditorContent
+          editor={editor}
+          className={`prose prose-sm max-w-none p-4 focus:outline-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:mb-4 prose-ul:mb-4 prose-ol:mb-4 prose-li:mb-1 prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic ${
+            isExpanded ? 'h-full min-h-[calc(100vh-200px)]' : 'min-h-[200px]'
+          }`}
+        />
+      </div>
     </div>
 
     {/* Full Screen Editor */}

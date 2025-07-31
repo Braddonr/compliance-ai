@@ -1,15 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from './button';
-import { Badge } from './badge';
-import RichTextEditor from './rich-text-editor';
-import {
-  X,
-  Save,
-  FileText,
-  Minimize2,
-  Sparkles,
-} from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "./button";
+import { Badge } from "./badge";
+import RichTextEditor from "./rich-text-editor";
+import { X, Save, FileText, Minimize2, Sparkles } from "lucide-react";
 
 interface FullScreenEditorProps {
   isOpen: boolean;
@@ -27,7 +21,7 @@ const FullScreenEditor: React.FC<FullScreenEditorProps> = ({
   onClose,
   content,
   onChange,
-  title = 'Document Editor',
+  title = "Document Editor",
   framework,
   isAIGenerated = false,
   onSave,
@@ -55,7 +49,7 @@ const FullScreenEditor: React.FC<FullScreenEditorProps> = ({
   const handleCancel = () => {
     if (hasChanges) {
       const confirmDiscard = window.confirm(
-        'You have unsaved changes. Are you sure you want to discard them?'
+        "You have unsaved changes. Are you sure you want to discard them?"
       );
       if (!confirmDiscard) return;
     }
@@ -65,9 +59,9 @@ const FullScreenEditor: React.FC<FullScreenEditorProps> = ({
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       handleCancel();
-    } else if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    } else if ((e.ctrlKey || e.metaKey) && e.key === "s") {
       e.preventDefault();
       handleSave();
     }
@@ -75,16 +69,16 @@ const FullScreenEditor: React.FC<FullScreenEditorProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
     } else {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
     }
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
     };
   }, [isOpen, hasChanges, localContent, content]);
 
@@ -117,7 +111,10 @@ const FullScreenEditor: React.FC<FullScreenEditorProps> = ({
                     </Badge>
                   )}
                   {isAIGenerated && (
-                    <Badge variant="secondary" className="text-xs flex items-center gap-1">
+                    <Badge
+                      variant="secondary"
+                      className="text-xs flex items-center gap-1"
+                    >
                       <Sparkles className="h-3 w-3" />
                       AI Generated
                     </Badge>
@@ -165,17 +162,15 @@ const FullScreenEditor: React.FC<FullScreenEditorProps> = ({
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
             className="flex-1 overflow-auto p-4"
-            style={{ height: 'calc(100vh - 80px)' }}
+            style={{ height: "calc(100vh - 80px)" }}
           >
-            <div className="h-full max-w-4xl mx-auto flex flex-col">
-              <div className="flex-1 overflow-auto">
-                <RichTextEditor
-                  content={localContent}
-                  onChange={handleContentChange}
-                  placeholder="Start writing your compliance document..."
-                  isExpanded={true}
-                />
-              </div>
+            <div className="h-full max-w-4xl mx-auto">
+              <RichTextEditor
+                content={localContent}
+                onChange={handleContentChange}
+                placeholder="Start writing your compliance document..."
+                isExpanded={true}
+              />
             </div>
           </motion.div>
 
@@ -187,8 +182,18 @@ const FullScreenEditor: React.FC<FullScreenEditorProps> = ({
             className="absolute bottom-4 left-4 text-xs text-muted-foreground bg-background/80 backdrop-blur rounded-lg px-3 py-2 border"
           >
             <div className="flex items-center gap-4">
-              <span>Press <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Esc</kbd> to cancel</span>
-              <span>Press <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Ctrl+S</kbd> to save</span>
+              <span>
+                Press{" "}
+                <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Esc</kbd>{" "}
+                to cancel
+              </span>
+              <span>
+                Press{" "}
+                <kbd className="px-1 py-0.5 bg-muted rounded text-xs">
+                  Ctrl+S
+                </kbd>{" "}
+                to save
+              </span>
             </div>
           </motion.div>
         </motion.div>
