@@ -89,7 +89,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   return (
     <>
-      <div className="border rounded-lg overflow-hidden flex flex-col h-full">
+      <div className={`border rounded-lg overflow-hidden flex flex-col ${isExpanded ? 'h-full' : 'max-h-96'}`}>
       {editable && (
         <div className="sticky top-0 z-10 border-b p-2 flex flex-wrap gap-1 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-sm">
           <Button
