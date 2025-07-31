@@ -38,10 +38,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import { complianceAPI, documentsAPI } from "@/lib/api";
 import ComplianceProgressTracker from "./ComplianceProgressTracker";
 import DocumentGrid from "./DocumentGrid";
+import Sidebar from "./layout/Sidebar";
+import DocumentViewModal from "./documents/DocumentViewModal";
+import CreateDocumentModal from "./documents/CreateDocumentModal";
 
 const Home = () => {
   const { user, logout } = useAuth();
   const [selectedFramework, setSelectedFramework] = useState<string>('all');
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
+  const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Fetch compliance progress
   const { data: complianceProgress, isLoading: progressLoading } = useQuery({
@@ -84,6 +90,15 @@ const Home = () => {
     }
   };
 
+  const handleDocumentClick = (documentId: string) => {
+    setSelectedDocumentId(documentId);
+    setIsDocumentModalOpen(true);
+  };
+
+  const handleCreateDocument = () => {
+    setIsCreateModalOpen(true);
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -100,61 +115,15 @@ const Home = () => {
   };
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="flex h-screen bg-background"
-    >
-      {/* Sidebar */}
-      <motion.div variants={itemVariants} className="hidden md:flex w-64 flex-col border-r bg-card p-4">
-        <div className="flex items-center gap-2 mb-8">
-          <Shield className="h-8 w-8 text-primary" />
-          <h1 className="text-xl font-bold">Compliance AI</h1>
-        </div>
-
-        <nav className="space-y-1">
-          <Button variant="ghost" className="w-full justify-start">
-            <FileText className="mr-2 h-4 w-4" />
-            Dashboard
-          </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <FileText className="mr-2 h-4 w-4" />
-            Documents
-          </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <FileText className="mr-2 h-4 w-4" />
-            Frameworks
-          </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <FileText className="mr-2 h-4 w-4" />
-            Team
-          </Button>
-          <Button variant="ghost" className="w-full justify-start">
-            <FileText className="mr-2 h-4 w-4" />
-            Settings
-          </Button>
-        </nav>
-
-        <div className="mt-auto">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="rounded-full bg-primary/10 p-2">
-                  <PlusCircle className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium">New Workflow</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Start compliance process
-                  </p>
-                </div>
-                <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </motion.div>
+    <>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="flex h-screen bg-background"
+      >
+        {/* Enhanced Sidebar */}
+        <Sidebar onCreateDocument={handleCreateDocument} />
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
@@ -246,7 +215,7 @@ const Home = () => {
             </div>
             <div className="mt-4 md:mt-0 flex gap-2">
               <Button variant="outline">Export Report</Button>
-              <Button>
+              <Button onClick={handleCreateDocument}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 New Document
               </Button>
@@ -298,7 +267,10 @@ const Home = () => {
                     </CardContent>
                   </Card>
                 ) : (
-                  <DocumentGrid documents={documents || []} />
+                  <DocumentGrid 
+                    documents={documents || []} 
+                    onDocumentClick={handleDocumentClick}
+                  />
                 )}
               </TabsContent>
             </Tabs>
@@ -306,6 +278,23 @@ const Home = () => {
         </main>
       </div>
     </motion.div>
+
+    {/* Modals */}
+    <DocumentViewModal
+      documentId={selectedDocumentId}
+      isOpen={isDocumentModalOpen}
+      onClose={() => {
+        setIsDocumentModalOpen(false);
+        setSelectedDocumentId(null);
+      }}
+    />
+    
+    <CreateDocumentModal
+      isOpen={isCreateModalOpen}
+      onClose={() => setIsCreateModalOpen(false)}
+      organizationId="default-org-id" // In a real app, get this from user context
+    />
+  </>
   );
 };
 
