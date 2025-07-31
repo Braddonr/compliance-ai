@@ -28,6 +28,7 @@ import {
 import { documentsAPI, complianceAPI } from '@/lib/api';
 import DocumentViewModal from '../documents/DocumentViewModal';
 import CreateDocumentModal from '../documents/CreateDocumentModal';
+import ExportReportModal from '../reports/ExportReportModal';
 import toast from 'react-hot-toast';
 
 const DocumentsPage = () => {

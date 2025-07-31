@@ -12,6 +12,7 @@ import ComplianceProgressTracker from "./ComplianceProgressTracker";
 import DocumentGrid from "./DocumentGrid";
 import DocumentViewModal from "./documents/DocumentViewModal";
 import CreateDocumentModal from "./documents/CreateDocumentModal";
+import ExportReportModal from "./reports/ExportReportModal";
 
 const Home = () => {
   const { user, logout } = useAuth();
@@ -21,6 +22,7 @@ const Home = () => {
   );
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Fetch compliance progress
   const { data: complianceProgress, isLoading: progressLoading } = useQuery({
@@ -73,6 +75,10 @@ const Home = () => {
     setIsCreateModalOpen(true);
   };
 
+  const handleExportReport = () => {
+    setIsExportModalOpen(true);
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -110,7 +116,7 @@ const Home = () => {
             </p>
           </div>
           <div className="mt-4 md:mt-0 flex gap-2">
-            <Button variant="outline">Export Report</Button>
+            <Button variant="outline" onClick={handleExportReport}>Export Report</Button>
             <Button onClick={handleCreateDocument}>
               <PlusCircle className="mr-2 h-4 w-4" />
               New Document
@@ -187,6 +193,14 @@ const Home = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         organizationId="default-org-id"
+      />
+
+      <ExportReportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        complianceProgress={complianceProgress || []}
+        documents={documents || []}
+        frameworks={frameworks || []}
       />
     </>
   );
