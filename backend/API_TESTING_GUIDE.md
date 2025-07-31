@@ -1,62 +1,29 @@
-# 🚀 Compliance AI API Testing Guide
+# Compliance AI API Testing Guide
 
-## Server Status
-✅ **Backend Server**: Running on `http://localhost:3000`  
-✅ **API Documentation**: Available at `http://localhost:3000/api/docs`  
-✅ **Database**: Seeded with sample data  
+This guide will help you test the Compliance AI API using the provided Postman collection.
 
-## 📋 Quick Setup for Postman
+## 🚀 Quick Start
 
-### 1. Import the Collection
-- Import the `Compliance_AI_API.postman_collection.json` file into Postman
-- The collection includes all endpoints with sample requests
+### 1. Import the Postman Collection
+- Open Postman
+- Click "Import" → "Upload Files"
+- Select `Compliance_AI_API.postman_collection.json`
 
-### 2. Set Collection Variables
-After importing, set these variables in your collection:
-
-```
-base_url: http://localhost:3000
-access_token: (will be set automatically after login)
+### 2. Start the Backend Server
+```bash
+cd backend
+npm run start:dev
 ```
 
-### 3. Sample IDs for Testing
-Use these real IDs from the seeded database:
+The server will start on `http://localhost:3000`
 
-#### 👥 Users
-- **Admin User**: `1f8d48b9-16cf-41a7-876e-8137cac97d95` (admin@demo-fintech.com)
-- **Compliance Officer**: `ca15b1bf-4abd-4184-809d-1e74bac22cbe` (compliance@demo-fintech.com)
-- **Team Member**: `e0c1b61c-386e-409c-8f83-5505d58571ec` (sam@demo-fintech.com)
-
-#### 📋 Frameworks
-- **PCI-DSS**: `60d1a1e2-fa10-40b3-8bcc-a1a64616cf1f`
-- **SOC2**: `8ad7892b-3305-44e9-9231-26c272efabb0`
-- **GDPR**: `bccf43ad-7049-48bc-a803-5d2b7f53c7be`
-- **ISO 27001**: `2d5030f3-e6b1-4fc0-94ef-4f20513212ca`
-
-#### 🏢 Organization
-- **Demo Fintech Company**: `203ed168-e9d5-42a4-809c-a09f5952d697`
-
-#### 📊 Compliance Progress
-- **PCI-DSS Progress**: `e92a5005-e4de-4258-961e-c02c5865f331`
-- **SOC2 Progress**: `e8841ca8-794f-4309-b1aa-7fabdd566b54`
-- **GDPR Progress**: `60f2157b-f45e-4561-b96b-b0f6e2dd3c6f`
-- **ISO 27001 Progress**: `ab1ec742-9c47-4811-8790-50cb878618cc`
-
-#### 📄 Documents
-- **PCI-DSS Documentation**: `e07fbdc1-58ed-4a3c-a250-f80a383e088d`
-- **SOC2 Audit Prep**: `73b2930c-730f-4841-8daa-11e380ca459f`
-- **GDPR Privacy Policy**: `3a16c3e0-5cc7-4ccf-b5ec-8f8220d2f2fe`
-- **ISO27001 Security**: `ea5afe4a-543f-4494-ad7f-f2f3fa236c63`
-
-#### ✅ Tasks
-- **Network Security Controls**: `efa35356-18ed-4a4f-863e-08e6adbe187e`
-- **Access Control Measures**: `5f329daa-7ad3-4aca-b510-83e29c60d68d`
-- **Risk Assessment Documentation**: `73bf887e-ec40-401c-8dd9-afc5cfe83cd2`
+### 3. Test the API Documentation
+Visit: `http://localhost:3000/api/docs` to see the Swagger documentation
 
 ## 🔐 Authentication Flow
 
-### Step 1: Login
-**POST** `/auth/login`
+### Step 1: Login with Demo User
+Use the **"Login User"** request with these credentials:
 ```json
 {
   "email": "admin@demo-fintech.com",
@@ -64,117 +31,135 @@ Use these real IDs from the seeded database:
 }
 ```
 
-**Response:**
-```json
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "id": "1f8d48b9-16cf-41a7-876e-8137cac97d95",
-    "email": "admin@demo-fintech.com",
-    "firstName": "Alex",
-    "lastName": "Johnson",
-    "role": "admin"
-  }
-}
-```
+The collection will automatically save the JWT token for subsequent requests.
 
-The collection will automatically save the `access_token` for subsequent requests.
+### Available Demo Users:
+- **Admin**: `admin@demo-fintech.com` / `password123`
+- **Compliance Officer**: `compliance@demo-fintech.com` / `password123`
+- **Team Member**: `sam@demo-fintech.com` / `password123`
+- **Team Member**: `jamie@demo-fintech.com` / `password123`
+
+## 📋 Testing Workflow
+
+### 1. Authentication
+1. **Login User** - Get JWT token
+2. **Register User** - Create new user (optional)
+3. **Logout User** - Clear session
+
+### 2. Compliance Management
+1. **Get All Frameworks** - View available compliance frameworks
+2. **Get Compliance Progress** - See organization's progress
+3. **Get Priority Tasks** - View high-priority tasks
+4. **Create Task** - Add new compliance task
+5. **Update Task** - Mark tasks as completed
+
+### 3. Document Management
+1. **Get All Documents** - View all documents
+2. **Get Documents by Framework** - Filter by compliance framework
+3. **Create Document** - Add new compliance document
+4. **Update Document** - Modify document content
+5. **Get Document Versions** - View version history
+6. **Add/Remove Collaborators** - Manage document access
+
+### 4. User Management
+1. **Get All Users** - View team members
+2. **Get User by ID** - View specific user details
+3. **Update User** - Modify user information
+
+### 5. AI Features
+1. **Generate Document** - Use AI to create compliance documents
+
+## 🔧 Collection Variables
+
+The collection uses these variables (automatically set):
+- `base_url`: API base URL (http://localhost:3000)
+- `access_token`: JWT token from login
+- `user_id`: Current user ID
+- `framework_id`: Selected framework ID
+- `document_id`: Selected document ID
+- `task_id`: Selected task ID
+
+## 📊 Sample Data
+
+The database is seeded with:
+
+### Frameworks:
+- **PCI-DSS**: Payment Card Industry Data Security Standard
+- **SOC2**: System and Organization Controls 2
+- **GDPR**: General Data Protection Regulation
+- **ISO27001**: Information Security Management System
+
+### Sample Documents:
+- PCI-DSS Compliance Documentation (75% complete)
+- SOC2 Type II Audit Preparation (45% complete)
+- GDPR Privacy Policy (90% complete)
+- ISO27001 Information Security (20% complete)
+
+### Sample Tasks:
+- Network Security Controls (High Priority, In Progress)
+- Access Control Measures (Medium Priority, Pending)
+- Risk Assessment Documentation (High Priority, Pending)
+- Vendor Management Process (High Priority, In Progress)
+- Data Processing Agreement (Medium Priority, Completed)
 
 ## 🧪 Testing Scenarios
 
-### Scenario 1: Basic Data Retrieval
-1. **Login** with admin credentials
-2. **Get All Frameworks** - Should return 4 frameworks
-3. **Get Compliance Progress** - Should show progress for all frameworks
-4. **Get All Documents** - Should return 4 sample documents
+### Scenario 1: New User Onboarding
+1. Register new user
+2. Login with new credentials
+3. View available frameworks
+4. Check compliance progress
 
-### Scenario 2: Task Management
-1. **Get Priority Tasks** - Should return high-priority tasks
-2. **Create New Task** - Use a framework ID and progress ID
-3. **Update Task Status** - Change from pending to completed
-4. **Get Tasks by Progress** - Verify the new task appears
+### Scenario 2: Document Collaboration
+1. Login as admin
+2. Create new document
+3. Add collaborators
+4. Update document content
+5. View version history
 
-### Scenario 3: Document Management
-1. **Get All Documents**
-2. **Create New Document** - Use framework and organization IDs
-3. **Update Document** - Change content and status
-4. **Add Collaborator** - Add a user as collaborator
-5. **Get Document Versions** - Should show version history
+### Scenario 3: Task Management
+1. View priority tasks
+2. Create new task
+3. Update task status to completed
+4. Check updated compliance progress
 
-### Scenario 4: User Management
-1. **Get All Users** - Should return seeded users
-2. **Create New User** - Register a new team member
-3. **Update User** - Modify user details
+### Scenario 4: Framework Analysis
+1. Get all frameworks
+2. Get progress for specific framework
+3. View framework-specific documents
+4. Generate AI document for framework
 
-## 🔍 Expected Responses
+## 🚨 Error Handling
 
-### Successful Authentication
-- **Status**: 200 OK
-- **Body**: Contains `access_token` and user details
+Common HTTP status codes:
+- **200**: Success
+- **201**: Created successfully
+- **400**: Bad request (validation error)
+- **401**: Unauthorized (invalid/missing token)
+- **404**: Resource not found
+- **500**: Internal server error
 
-### Get Compliance Progress
-- **Status**: 200 OK
-- **Body**: Array of progress objects with calculated percentages
+## 🔍 Debugging Tips
 
-### Get Documents
-- **Status**: 200 OK
-- **Body**: Array of documents with collaborators and framework info
+1. **Check Console**: Postman console shows automatic variable updates
+2. **Verify Token**: Ensure JWT token is saved after login
+3. **Check Variables**: Use `{{variable_name}}` syntax in requests
+4. **Server Logs**: Check backend console for detailed error messages
+5. **Swagger Docs**: Use `/api/docs` for endpoint documentation
 
-### Create Operations
-- **Status**: 201 Created
-- **Body**: Created entity with generated ID
+## 📝 Notes
 
-### Update Operations
-- **Status**: 200 OK
-- **Body**: Updated entity
+- All endpoints (except auth) require JWT authentication
+- The collection automatically handles token management
+- Variables are automatically updated from successful responses
+- Use the pre-request script to debug authentication issues
 
-## 🚨 Error Scenarios to Test
+## 🎯 Next Steps
 
-### Authentication Errors
-- **401 Unauthorized**: Missing or invalid token
-- **403 Forbidden**: Insufficient permissions
-
-### Validation Errors
-- **400 Bad Request**: Invalid request body
-- **422 Unprocessable Entity**: Validation failures
-
-### Not Found Errors
-- **404 Not Found**: Invalid UUIDs or non-existent resources
-
-## 📊 API Documentation
-Visit `http://localhost:3000/api/docs` for interactive Swagger documentation with:
-- Complete endpoint documentation
-- Request/response schemas
-- Try-it-out functionality
-- Authentication setup
-
-## 🔧 Troubleshooting
-
-### Server Not Responding
-```bash
-cd backend
-npm run start:dev
-```
-
-### Database Issues
-```bash
-cd backend
-npm run seed
-```
-
-### Get Fresh Sample IDs
-```bash
-cd backend
-node get-sample-ids.js
-```
-
-## 🎯 Key Features to Test
-
-1. **JWT Authentication** - All endpoints require valid tokens
-2. **Role-based Access** - Different user roles have different permissions
-3. **Data Relationships** - Documents linked to frameworks, tasks to progress
-4. **Validation** - Proper error handling for invalid data
-5. **Pagination** - Large datasets are properly paginated
-6. **Real-time Updates** - Progress calculations update automatically
+After testing the API:
+1. Integrate with your frontend application
+2. Implement real-time features with WebSockets
+3. Add AI integration with OpenAI/Claude APIs
+4. Set up production database and deployment
 
 Happy testing! 🚀

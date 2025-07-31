@@ -1,7 +1,8 @@
 {
   "info": {
     "name": "Compliance AI API",
-    "description": "AI-Powered Compliance Copilot API Collection",
+    "description": "AI-Powered Compliance Copilot API - Complete collection for testing all endpoints",
+    "version": "1.0.0",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -22,6 +23,31 @@
     },
     {
       "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "organization_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "framework_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "document_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "task_id",
       "value": "",
       "type": "string"
     }
@@ -50,23 +76,26 @@
               "path": ["auth", "register"]
             }
           },
-          "response": []
-        },
-        {
-          "name": "Login User",
+          "response": [],
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 200) {",
+                  "if (pm.response.code === 201) {",
                   "    const response = pm.response.json();",
                   "    pm.collectionVariables.set('access_token', response.access_token);",
+                  "    pm.collectionVariables.set('user_id', response.user.id);",
+                  "    console.log('Token saved:', response.access_token);",
                   "}"
-                ]
+                ],
+                "type": "text/javascript"
               }
             }
-          ],
+          ]
+        },
+        {
+          "name": "Login User",
           "request": {
             "method": "POST",
             "header": [
@@ -83,6 +112,40 @@
               "raw": "{{base_url}}/auth/login",
               "host": ["{{base_url}}"],
               "path": ["auth", "login"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', response.access_token);",
+                  "    pm.collectionVariables.set('user_id', response.user.id);",
+                  "    console.log('Login successful, token saved:', response.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
             }
           },
           "response": []
@@ -119,28 +182,6 @@
           "response": []
         },
         {
-          "name": "Create User",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"firstName\": \"New\",\n  \"lastName\": \"User\",\n  \"password\": \"password123\",\n  \"role\": \"team_member\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/users",
-              "host": ["{{base_url}}"],
-              "path": ["users"]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Update User",
           "request": {
             "method": "PATCH",
@@ -161,6 +202,28 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"firstName\": \"New\",\n  \"lastName\": \"User\",\n  \"password\": \"password123\",\n  \"role\": \"team_member\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -178,7 +241,24 @@
               "path": ["compliance", "frameworks"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.length > 0) {",
+                  "        pm.collectionVariables.set('framework_id', response[0].id);",
+                  "        console.log('Framework ID saved:', response[0].id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Get Compliance Progress",
@@ -220,19 +300,6 @@
           "response": []
         },
         {
-          "name": "Get Tasks by Progress ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/compliance/progress/{{progress_id}}/tasks",
-              "host": ["{{base_url}}"],
-              "path": ["compliance", "progress", "{{progress_id}}", "tasks"]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Create Task",
           "request": {
             "method": "POST",
@@ -244,7 +311,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"New Compliance Task\",\n  \"description\": \"Description of the new task\",\n  \"priority\": \"high\",\n  \"status\": \"pending\",\n  \"dueDate\": \"2024-09-01T00:00:00Z\",\n  \"frameworkId\": \"{{framework_id}}\",\n  \"complianceProgressId\": \"{{progress_id}}\",\n  \"requirements\": [\"Requirement 1\", \"Requirement 2\"]\n}"
+              "raw": "{\n  \"name\": \"New Compliance Task\",\n  \"description\": \"Description of the new task\",\n  \"priority\": \"high\",\n  \"status\": \"pending\",\n  \"dueDate\": \"2024-09-01T00:00:00Z\",\n  \"requirements\": [\"Requirement 1\", \"Requirement 2\"],\n  \"frameworkId\": \"{{framework_id}}\",\n  \"complianceProgressId\": \"progress-id-here\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/compliance/tasks",
@@ -252,7 +319,22 @@
               "path": ["compliance", "tasks"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('task_id', response.id);",
+                  "    console.log('Task ID saved:', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Update Task",
@@ -292,7 +374,24 @@
               "path": ["documents"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.length > 0) {",
+                  "        pm.collectionVariables.set('document_id', response[0].id);",
+                  "        console.log('Document ID saved:', response[0].id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Get Documents by Framework",
@@ -338,7 +437,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"New Compliance Document\",\n  \"description\": \"A new compliance document for testing\",\n  \"content\": \"# New Document\\n\\nThis is the content of the new document.\",\n  \"status\": \"draft\",\n  \"progress\": 0,\n  \"frameworkId\": \"{{framework_id}}\",\n  \"organizationId\": \"{{organization_id}}\",\n  \"metadata\": {\n    \"category\": \"security\",\n    \"priority\": \"medium\"\n  }\n}"
+              "raw": "{\n  \"title\": \"New Compliance Document\",\n  \"description\": \"A new document for compliance tracking\",\n  \"content\": \"# New Document\\n\\nThis is the content of the new document.\",\n  \"status\": \"draft\",\n  \"progress\": 0,\n  \"frameworkId\": \"{{framework_id}}\",\n  \"organizationId\": \"default-org-id\",\n  \"changeLog\": \"Initial document creation\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/documents",
@@ -346,7 +445,22 @@
               "path": ["documents"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('document_id', response.id);",
+                  "    console.log('New Document ID saved:', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Update Document",
@@ -360,7 +474,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Updated Document Title\",\n  \"content\": \"# Updated Document\\n\\nThis is the updated content.\",\n  \"status\": \"in_review\",\n  \"progress\": 50,\n  \"changeLog\": \"Updated content and status\"\n}"
+              "raw": "{\n  \"title\": \"Updated Document Title\",\n  \"content\": \"# Updated Document\\n\\nThis is the updated content.\",\n  \"status\": \"in_review\",\n  \"progress\": 50,\n  \"changeLog\": \"Updated document content and status\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/documents/{{document_id}}",
@@ -371,14 +485,14 @@
           "response": []
         },
         {
-          "name": "Delete Document",
+          "name": "Get Document Versions",
           "request": {
-            "method": "DELETE",
+            "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/documents/{{document_id}}",
+              "raw": "{{base_url}}/documents/{{document_id}}/versions",
               "host": ["{{base_url}}"],
-              "path": ["documents", "{{document_id}}"]
+              "path": ["documents", "{{document_id}}", "versions"]
             }
           },
           "response": []
@@ -410,14 +524,14 @@
           "response": []
         },
         {
-          "name": "Get Document Versions",
+          "name": "Delete Document",
           "request": {
-            "method": "GET",
+            "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/documents/{{document_id}}/versions",
+              "raw": "{{base_url}}/documents/{{document_id}}",
               "host": ["{{base_url}}"],
-              "path": ["documents", "{{document_id}}", "versions"]
+              "path": ["documents", "{{document_id}}"]
             }
           },
           "response": []
@@ -468,6 +582,55 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "API Documentation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/docs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "docs"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-set authorization header if token exists",
+          "const token = pm.collectionVariables.get('access_token');",
+          "if (token && !pm.request.headers.has('Authorization')) {",
+          "    pm.request.headers.add({",
+          "        key: 'Authorization',",
+          "        value: 'Bearer ' + token",
+          "    });",
+          "}"
+        ]
+      }
     }
   ]
 }

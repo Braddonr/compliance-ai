@@ -28,4 +28,13 @@ export class AuthController {
     const user = await this.usersService.create(createUserDto);
     return this.authService.login(user);
   }
+
+  @Post('logout')
+  @ApiOperation({ summary: 'User logout' })
+  @ApiResponse({ status: 200, description: 'Logout successful' })
+  async logout() {
+    // Since we're using stateless JWT, logout is handled client-side
+    // In a production app, you might want to implement token blacklisting
+    return { message: 'Logout successful' };
+  }
 }
