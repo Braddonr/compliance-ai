@@ -1,0 +1,473 @@
+{
+  "info": {
+    "name": "Compliance AI API",
+    "description": "AI-Powered Compliance Copilot API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"password\": \"password123\",\n  \"role\": \"team_member\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', response.access_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@demo-fintech.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"firstName\": \"New\",\n  \"lastName\": \"User\",\n  \"password\": \"password123\",\n  \"role\": \"team_member\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Updated\",\n  \"lastName\": \"Name\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{user_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Compliance",
+      "item": [
+        {
+          "name": "Get All Frameworks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/compliance/frameworks",
+              "host": ["{{base_url}}"],
+              "path": ["compliance", "frameworks"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Compliance Progress",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/compliance/progress",
+              "host": ["{{base_url}}"],
+              "path": ["compliance", "progress"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Progress by Framework",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/compliance/progress/{{framework_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["compliance", "progress", "{{framework_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Priority Tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/compliance/tasks/priority",
+              "host": ["{{base_url}}"],
+              "path": ["compliance", "tasks", "priority"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tasks by Progress ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/compliance/progress/{{progress_id}}/tasks",
+              "host": ["{{base_url}}"],
+              "path": ["compliance", "progress", "{{progress_id}}", "tasks"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Compliance Task\",\n  \"description\": \"Description of the new task\",\n  \"priority\": \"high\",\n  \"status\": \"pending\",\n  \"dueDate\": \"2024-09-01T00:00:00Z\",\n  \"frameworkId\": \"{{framework_id}}\",\n  \"complianceProgressId\": \"{{progress_id}}\",\n  \"requirements\": [\"Requirement 1\", \"Requirement 2\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/compliance/tasks",
+              "host": ["{{base_url}}"],
+              "path": ["compliance", "tasks"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\",\n  \"notes\": \"Task completed successfully\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/compliance/tasks/{{task_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["compliance", "tasks", "{{task_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Documents",
+      "item": [
+        {
+          "name": "Get All Documents",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/documents",
+              "host": ["{{base_url}}"],
+              "path": ["documents"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Documents by Framework",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/documents?framework={{framework_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["documents"],
+              "query": [
+                {
+                  "key": "framework",
+                  "value": "{{framework_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Document by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/documents/{{document_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["documents", "{{document_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"New Compliance Document\",\n  \"description\": \"A new compliance document for testing\",\n  \"content\": \"# New Document\\n\\nThis is the content of the new document.\",\n  \"status\": \"draft\",\n  \"progress\": 0,\n  \"frameworkId\": \"{{framework_id}}\",\n  \"organizationId\": \"{{organization_id}}\",\n  \"metadata\": {\n    \"category\": \"security\",\n    \"priority\": \"medium\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/documents",
+              "host": ["{{base_url}}"],
+              "path": ["documents"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Document",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Document Title\",\n  \"content\": \"# Updated Document\\n\\nThis is the updated content.\",\n  \"status\": \"in_review\",\n  \"progress\": 50,\n  \"changeLog\": \"Updated content and status\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/documents/{{document_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["documents", "{{document_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Document",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/documents/{{document_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["documents", "{{document_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Collaborator",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/documents/{{document_id}}/collaborators/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["documents", "{{document_id}}", "collaborators", "{{user_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Collaborator",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/documents/{{document_id}}/collaborators/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["documents", "{{document_id}}", "collaborators", "{{user_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Document Versions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/documents/{{document_id}}/versions",
+              "host": ["{{base_url}}"],
+              "path": ["documents", "{{document_id}}", "versions"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Collaboration",
+      "item": [
+        {
+          "name": "Get Document Comments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/collaboration/documents/{{document_id}}/comments",
+              "host": ["{{base_url}}"],
+              "path": ["collaboration", "documents", "{{document_id}}", "comments"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "AI",
+      "item": [
+        {
+          "name": "Generate Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"framework\": \"PCI-DSS\",\n  \"requirements\": [\n    \"Network Security Controls\",\n    \"Access Control Measures\",\n    \"Data Protection\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ai/generate-document",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "generate-document"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

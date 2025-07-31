@@ -28,8 +28,8 @@ export class DocumentsController {
   @ApiOperation({ summary: 'Get all documents' })
   @ApiResponse({ status: 200, description: 'Documents retrieved successfully' })
   @ApiQuery({ name: 'framework', required: false, description: 'Filter by framework ID' })
-  findAll(@Request() req, @Query('framework') frameworkId?: string) {
-    const organizationId = req.user.organizationId || 'default-org-id';
+  findAll(@Request() req: any, @Query('framework') frameworkId?: string) {
+    const organizationId = req.user.organizationId || '203ed168-e9d5-42a4-809c-a09f5952d697';
     
     if (frameworkId) {
       return this.documentsService.getByFramework(frameworkId, organizationId);
@@ -49,7 +49,7 @@ export class DocumentsController {
   @Post()
   @ApiOperation({ summary: 'Create a new document' })
   @ApiResponse({ status: 201, description: 'Document created successfully' })
-  create(@Body() createDocumentDto: CreateDocumentDto, @Request() req) {
+  create(@Body() createDocumentDto: CreateDocumentDto, @Request() req: any) {
     return this.documentsService.create(createDocumentDto, req.user.userId);
   }
 
@@ -60,7 +60,7 @@ export class DocumentsController {
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateDocumentDto: UpdateDocumentDto,
-    @Request() req,
+    @Request() req: any,
   ) {
     return this.documentsService.update(id, updateDocumentDto, req.user.userId);
   }

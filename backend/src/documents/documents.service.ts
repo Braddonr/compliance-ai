@@ -148,9 +148,10 @@ export class DocumentsService {
   private async createVersion(documentId: string, versionData: any): Promise<DocumentVersion> {
     const version = this.versionsRepository.create({
       ...versionData,
-      document: { id: documentId },
+      document: { id: documentId } as any,
     });
-    return this.versionsRepository.save(version);
+    const savedVersion = await this.versionsRepository.save(version);
+    return Array.isArray(savedVersion) ? savedVersion[0] : savedVersion;
   }
 
   private incrementVersion(currentVersion: string): string {
