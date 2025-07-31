@@ -7,6 +7,12 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import LoginPage from "./components/auth/LoginPage";
 import RegisterPage from "./components/auth/RegisterPage";
 import Home from "./components/home";
+import Layout from "./components/layout/Layout";
+import DocumentsPage from "./components/pages/DocumentsPage";
+import TasksPage from "./components/pages/TasksPage";
+import AnalyticsPage from "./components/pages/AnalyticsPage";
+import TeamPage from "./components/pages/TeamPage";
+import SettingsPage from "./components/pages/SettingsPage";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -27,14 +33,23 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route
-              path="/dashboard"
+              path="/*"
               element={
                 <ProtectedRoute>
-                  <Home />
+                  <Layout>
+                    <Routes>
+                      <Route path="/dashboard" element={<Home />} />
+                      <Route path="/documents" element={<DocumentsPage />} />
+                      <Route path="/tasks" element={<TasksPage />} />
+                      <Route path="/analytics" element={<AnalyticsPage />} />
+                      <Route path="/team" element={<TeamPage />} />
+                      <Route path="/settings" element={<SettingsPage />} />
+                      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                    </Routes>
+                  </Layout>
                 </ProtectedRoute>
               }
             />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </Suspense>
         
