@@ -32,10 +32,10 @@ export class ComplianceController {
   @Get('progress')
   @ApiOperation({ summary: 'Get compliance progress for organization' })
   @ApiResponse({ status: 200, description: 'Progress retrieved successfully' })
-  getProgress(@Request() req) {
+  getProgress(@Request() req: any) {
     // In a real app, you'd get organizationId from the user's JWT token
-    // For now, we'll use a placeholder
-    const organizationId = req.user.organizationId || 'default-org-id';
+    // For now, we'll use the seeded organization ID
+    const organizationId = req.user.organizationId || '203ed168-e9d5-42a4-809c-a09f5952d697';
     return this.complianceService.getProgress(organizationId);
   }
 
@@ -43,18 +43,18 @@ export class ComplianceController {
   @ApiOperation({ summary: 'Get compliance progress for specific framework' })
   @ApiResponse({ status: 200, description: 'Framework progress retrieved successfully' })
   getProgressByFramework(
-    @Request() req,
+    @Request() req: any,
     @Param('frameworkId', ParseUUIDPipe) frameworkId: string,
   ) {
-    const organizationId = req.user.organizationId || 'default-org-id';
+    const organizationId = req.user.organizationId || '203ed168-e9d5-42a4-809c-a09f5952d697';
     return this.complianceService.getProgressByFramework(organizationId, frameworkId);
   }
 
   @Get('tasks/priority')
   @ApiOperation({ summary: 'Get high priority tasks' })
   @ApiResponse({ status: 200, description: 'Priority tasks retrieved successfully' })
-  getPriorityTasks(@Request() req) {
-    const organizationId = req.user.organizationId || 'default-org-id';
+  getPriorityTasks(@Request() req: any) {
+    const organizationId = req.user.organizationId || '203ed168-e9d5-42a4-809c-a09f5952d697';
     return this.complianceService.getPriorityTasks(organizationId);
   }
 
