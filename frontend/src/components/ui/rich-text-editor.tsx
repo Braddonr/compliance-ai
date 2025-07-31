@@ -17,6 +17,8 @@ import {
   Heading1,
   Heading2,
   Heading3,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 
 interface RichTextEditorProps {
@@ -24,6 +26,8 @@ interface RichTextEditorProps {
   onChange: (content: string) => void;
   placeholder?: string;
   editable?: boolean;
+  isExpanded?: boolean;
+  onToggleExpand?: () => void;
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
@@ -31,6 +35,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   onChange,
   placeholder = 'Start writing...',
   editable = true,
+  isExpanded = false,
+  onToggleExpand,
 }) => {
   const editor = useEditor({
     extensions: [
@@ -164,11 +170,27 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           >
             <Redo className="h-4 w-4" />
           </Button>
+          {onToggleExpand && (
+            <>
+              <div className="border-l mx-2" />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={onToggleExpand}
+                title={isExpanded ? 'Minimize editor' : 'Expand editor'}
+              >
+                {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              </Button>
+            </>
+          )}
         </div>
       )}
       <EditorContent
         editor={editor}
-        className="prose prose-sm max-w-none p-4 min-h-[200px] focus:outline-none"
+        className={`prose prose-sm max-w-none p-4 focus:outline-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-p:mb-4 prose-ul:mb-4 prose-ol:mb-4 prose-li:mb-1 prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic ${
+          isExpanded ? 'min-h-[60vh]' : 'min-h-[200px]'
+        }`}
       />
     </div>
   );

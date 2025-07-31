@@ -11,7 +11,12 @@ export class AiController {
   constructor(private readonly aiService: AiService) {}
 
   @Post('generate-document')
-  generateDocument(@Body() body: { framework: string; requirements: string[] }) {
+  generateDocument(@Body() body: { 
+    framework: string; 
+    requirements: string[];
+    title?: string;
+    description?: string;
+  }) {
     return this.aiService.generateComplianceDocument(body.framework, body.requirements);
   }
 }
