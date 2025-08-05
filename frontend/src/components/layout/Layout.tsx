@@ -80,7 +80,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <div className="p-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
                 <Settings className="h-6 w-6 text-white" />
               </div>
-              <h1 className="text-lg font-bold">Compliance AI</h1>
+              <h1 className="text-lg font-bold">Compliance Companion</h1>
             </div>
 
             <div className="relative hidden md:block w-96">

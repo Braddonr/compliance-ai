@@ -98,7 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('user', JSON.stringify(response.user));
       setUser(response.user);
       
-      toast.success(`Welcome to Compliance AI, ${response.user.firstName}!`, {
+      toast.success(`Welcome to Compliance Companion, ${response.user.firstName}!`, {
         icon: '🎉',
         duration: 4000,
       });

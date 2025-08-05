@@ -144,7 +144,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCreateDocument }) => {
             <Shield className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-bold">Compliance AI</h1>
+            <h1 className="text-lg font-bold">Compliance Companion</h1>
             <p className="text-xs text-muted-foreground">Smart Compliance</p>
           </div>
         </div>
@@ -309,7 +309,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCreateDocument }) => {
       <div className="p-4 border-t">
         <div className="text-center">
           <p className="text-xs text-muted-foreground">
-            © 2024 Compliance AI
+            © 2024 Compliance Companion
           </p>
           <p className="text-xs text-muted-foreground">
             Secure & Compliant

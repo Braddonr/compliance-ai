@@ -87,7 +87,7 @@ const LoginPage = () => {
             <Shield className="h-8 w-8 text-white" />
           </motion.div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Compliance AI
+            Compliance Companion
           </h1>
           <p className="text-gray-600 mt-2">Welcome back! Please sign in to continue.</p>
         </motion.div>
@@ -208,7 +208,7 @@ const LoginPage = () => {
         {/* Footer */}
         <motion.div variants={itemVariants} className="mt-8 text-center">
           <p className="text-xs text-gray-500">
-            © 2024 Compliance AI. Secure compliance management platform.
+            © 2024 Compliance Companion. Secure compliance management platform.
           </p>
         </motion.div>
       </motion.div>
