@@ -32,6 +32,7 @@ import {
   FileImage,
 } from 'lucide-react';
 import { exportReportService } from '@/lib/exportService';
+import { aiAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 interface ExportReportModalProps {
@@ -78,6 +79,37 @@ const ExportReportModal: React.FC<ExportReportModalProps> = ({
   const handleExport = async () => {
     setIsExporting(true);
     try {
+      // Prepare compliance data for AI analysis
+      const complianceData = {
+        totalTasks: complianceProgress.reduce((sum, progress) => sum + (progress.totalTasks || 0), 0),
+        completedTasks: complianceProgress.reduce((sum, progress) => sum + (progress.completedTasks || 0), 0),
+        inProgressTasks: complianceProgress.reduce((sum, progress) => sum + (progress.inProgressTasks || 0), 0),
+        pendingTasks: complianceProgress.reduce((sum, progress) => sum + (progress.pendingTasks || 0), 0),
+        overallProgress: complianceProgress.reduce((sum, progress) => sum + (progress.progressPercentage || 0), 0) / Math.max(complianceProgress.length, 1),
+        frameworkData: complianceProgress.map(progress => ({
+          name: progress.framework?.displayName || 'Unknown',
+          progress: progress.progressPercentage || 0,
+          completed: progress.completedTasks || 0,
+          total: progress.totalTasks || 0,
+          inProgress: progress.inProgressTasks || 0,
+          pending: progress.pendingTasks || 0,
+        })),
+        documentStats: documents.reduce((stats, doc) => {
+          stats[doc.status] = (stats[doc.status] || 0) + 1;
+          return stats;
+        }, { draft: 0, review: 0, approved: 0, archived: 0 }),
+      };
+
+      // Get AI-powered analysis
+      const aiAnalysis = await aiAPI.generateReport({
+        reportType,
+        frameworks: selectedFrameworks.length > 0 ? selectedFrameworks : frameworks.map((f: any) => f.id),
+        complianceData,
+        includeCharts,
+        includeRecommendations: true,
+      });
+
+      // Generate the report with AI insights
       const exportOptions = {
         format: exportFormat,
         type: reportType,
@@ -90,10 +122,11 @@ const ExportReportModal: React.FC<ExportReportModalProps> = ({
         complianceProgress,
         documents,
         frameworks,
+        aiAnalysis, // Include AI-generated insights
       };
 
       await exportReportService.generateReport(exportOptions);
-      toast.success(`Report exported successfully as ${exportFormat.toUpperCase()}!`);
+      toast.success(`AI-powered report exported successfully as ${exportFormat.toUpperCase()}!`);
       onClose();
     } catch (error) {
       console.error('Export error:', error);

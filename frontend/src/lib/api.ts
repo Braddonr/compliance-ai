@@ -166,4 +166,24 @@ export const aiAPI = {
     const response = await api.post('/ai/generate-document', { framework, requirements });
     return response.data;
   },
+  
+  generateReport: async (reportData: {
+    reportType: string;
+    frameworks: string[];
+    complianceData: any;
+    includeCharts: boolean;
+    includeRecommendations: boolean;
+  }) => {
+    const response = await api.post('/ai/generate-report', reportData);
+    return response.data;
+  },
+  
+  analyzeCompliance: async (analysisData: {
+    currentState: any;
+    targetFramework: string;
+    organizationContext?: string;
+  }) => {
+    const response = await api.post('/ai/analyze-compliance', analysisData);
+    return response.data;
+  },
 };
