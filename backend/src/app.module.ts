@@ -24,7 +24,7 @@ import { SettingsModule } from './settings/settings.module';
       password: process.env.DB_PASSWORD || 'password',
       database: process.env.DB_NAME || 'compliance_ai',
       autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV !== 'production',
+      synchronize: true, // Enable for initial deployment to create tables
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
       extra: {
         connectionLimit: 10,
