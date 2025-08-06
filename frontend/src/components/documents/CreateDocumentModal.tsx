@@ -28,14 +28,18 @@ import {
   Plus,
   X,
   Wand2,
+  Users,
+  CheckCircle,
 } from 'lucide-react';
-import { documentsAPI, complianceAPI, aiAPI, settingsAPI } from '@/lib/api';
+import { documentsAPI, complianceAPI, aiAPI, settingsAPI, usersAPI } from '@/lib/api';
 
 const createDocumentSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
   frameworkId: z.string().min(1, 'Framework is required'),
   content: z.string().min(1, 'Content is required'),
+  status: z.enum(['draft', 'in_review', 'approved', 'published', 'archived']).default('draft'),
+  collaboratorIds: z.array(z.string()).optional(),
   requirements: z.array(z.string()).optional(), // Used for AI generation only
   useAI: z.boolean().optional(), // Used for UI state only
 });
@@ -95,9 +99,28 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
+  // Fetch users for collaborators selection
+  const { data: users } = useQuery({
+    queryKey: ['users'],
+    queryFn: usersAPI.getAll,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
   // Create document mutation
   const createMutation = useMutation({
-    mutationFn: (data: any) => documentsAPI.create(data),
+    mutationFn: async (data: { documentData: any; collaboratorIds: string[] }) => {
+      // Create the document first
+      const createdDocument = await documentsAPI.create(data.documentData);
+      
+      // Add collaborators if any were selected
+      if (data.collaboratorIds.length > 0) {
+        for (const userId of data.collaboratorIds) {
+          await documentsAPI.addCollaborator(createdDocument.id, userId);
+        }
+      }
+      
+      return createdDocument;
+    },
     onSuccess: () => {
       toast.success('Document created successfully!', { icon: '🎉' });
       queryClient.invalidateQueries({ queryKey: ['documents'] });
@@ -191,8 +214,8 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
     generateMutation.mutate(aiData);
   };
 
-  const onSubmit = (data: CreateDocumentFormData) => {
-    // Create the document data structure expected by the backend
+  const onSubmit = async (data: CreateDocumentFormData) => {
+    // Create the document data structure expected by the backend (without collaborators)
     const documentData = {
       title: data.title,
       description: data.description || '',
@@ -200,11 +223,11 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
       frameworkId: data.frameworkId, // This should be the UUID of the framework
       organizationId: organizationId || '203ed168-e9d5-42a4-809c-a09f5952d697', // Use default org ID if not provided
       progress: 0,
-      status: 'draft' as const,
+      status: data.status || 'draft', // Use the selected status
       changeLog: 'Initial document creation',
     };
     
-    createMutation.mutate(documentData);
+    createMutation.mutate({ documentData, collaboratorIds: data.collaboratorIds || [] });
   };
 
   const commonRequirements = {
@@ -328,6 +351,104 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
                         {...register('description')}
                         rows={3}
                       />
+                    </div>
+
+                    {/* Document Status and Collaborators */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="status" className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4" />
+                          Document Status
+                        </Label>
+                        <Select onValueChange={(value) => setValue('status', value as any)} defaultValue="draft">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="draft">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                                Draft
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="in_review">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                In Review
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="published">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                Published
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="approved">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                Approved
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="archived">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                                Archived
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                          Set the initial status for this document
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          Collaborators
+                        </Label>
+                        <div className="border rounded-md p-3 min-h-[40px] bg-background">
+                          {users && users.length > 0 ? (
+                            <div className="space-y-2">
+                              <div className="flex flex-wrap gap-2 max-h-20 overflow-y-auto">
+                                {users.slice(0, 5).map((user: any) => (
+                                  <div key={user.id} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`collaborator-${user.id}`}
+                                      onCheckedChange={(checked) => {
+                                        const currentCollaborators = watch('collaboratorIds') || [];
+                                        if (checked) {
+                                          setValue('collaboratorIds', [...currentCollaborators, user.id]);
+                                        } else {
+                                          setValue('collaboratorIds', currentCollaborators.filter(id => id !== user.id));
+                                        }
+                                      }}
+                                    />
+                                    <Label
+                                      htmlFor={`collaborator-${user.id}`}
+                                      className="text-sm font-normal cursor-pointer"
+                                    >
+                                      {user.firstName} {user.lastName}
+                                    </Label>
+                                  </div>
+                                ))}
+                              </div>
+                              {users.length > 5 && (
+                                <p className="text-xs text-muted-foreground">
+                                  +{users.length - 5} more users available
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">
+                              No users available for collaboration
+                            </p>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Select team members who can collaborate on this document
+                        </p>
+                      </div>
                     </div>
 
                     {/* Tab Content */}
