@@ -38,6 +38,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { documentsAPI, usersAPI } from "@/lib/api";
+import { formatStatus, getDocumentStatusColor } from "@/lib/status-utils";
 
 interface DocumentViewModalProps {
   documentId: string | null;
@@ -182,22 +183,7 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
     toast.success("Document link copied to clipboard!", { icon: "📋" });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "draft":
-        return "bg-gray-100 text-gray-800";
-      case "in_review":
-        return "bg-yellow-100 text-yellow-800";
-      case "approved":
-        return "bg-green-100 text-green-800";
-      case "published":
-        return "bg-blue-100 text-blue-800";
-      case "archived":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+
 
   if (!isOpen || !documentId) return null;
 
@@ -249,8 +235,8 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
                       </DialogTitle>
                     )}
                     <DialogDescription className="mt-2 flex items-center gap-4 flex-wrap">
-                      <Badge className={getStatusColor(document?.status)}>
-                        {document?.status?.replace("_", " ").toUpperCase()}
+                      <Badge className={getDocumentStatusColor(document?.status || "")}>
+                        {formatStatus(document?.status || "")}
                       </Badge>
                       <Badge variant="outline">
                         {document?.framework?.displayName}

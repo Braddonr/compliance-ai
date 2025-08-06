@@ -27,6 +27,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { complianceAPI } from '@/lib/api';
+import { formatStatus, getTaskStatusColor } from '@/lib/status-utils';
 import toast from 'react-hot-toast';
 
 const TasksPage = () => {
@@ -277,8 +278,8 @@ const TasksPage = () => {
                               </p>
                               
                               <div className="flex flex-wrap gap-2 text-xs">
-                                <Badge className={getStatusColor(task.status)}>
-                                  {task.status?.replace('_', ' ')}
+                                <Badge className={getTaskStatusColor(task.status)}>
+                                  {formatStatus(task.status)}
                                 </Badge>
                                 {task.priority && (
                                   <Badge className={getPriorityColor(task.priority)}>
