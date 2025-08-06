@@ -16,6 +16,7 @@ import { DatabaseModule } from './database/database.module';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
+      url: process.env.DATABASE_URL,
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT) || 5432,
       username: process.env.DB_USERNAME || 'postgres',
@@ -23,6 +24,10 @@ import { DatabaseModule } from './database/database.module';
       database: process.env.DB_NAME || 'compliance_ai',
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+      extra: {
+        connectionLimit: 10,
+      },
     }),
     AuthModule,
     UsersModule,
