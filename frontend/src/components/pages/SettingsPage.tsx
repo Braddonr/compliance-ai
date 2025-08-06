@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import {
   Settings,
   Bot,
@@ -32,11 +32,11 @@ import {
   Lock,
   Mail,
   Smartphone,
-} from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { settingsAPI } from '@/lib/api';
-import toast from 'react-hot-toast';
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { settingsAPI } from "@/lib/api";
+import toast from "react-hot-toast";
 
 const SettingsPage = () => {
   const { user } = useAuth();
@@ -45,46 +45,49 @@ const SettingsPage = () => {
 
   // Fetch existing AI settings from backend
   const { data: backendAISettings, isLoading: settingsLoading } = useQuery({
-    queryKey: ['settings', 'ai'],
+    queryKey: ["settings", "ai"],
     queryFn: settingsAPI.getAISettings,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 
   // AI Model Settings
   const [aiSettings, setAiSettings] = useState({
-    model: 'gpt-4',
+    model: "gpt-4",
     temperature: 0.7,
     maxTokens: 2000,
-    systemPrompt: 'You are a compliance expert assistant helping to generate accurate and comprehensive compliance documentation.',
+    systemPrompt:
+      "You are a compliance expert assistant helping to generate accurate and comprehensive compliance documentation.",
     enableAutoGeneration: true,
     enableSmartSuggestions: true,
-    customInstructions: '',
-    companyContext: '',
+    customInstructions: "",
+    companyContext: "",
   });
 
   // Update local state when backend data loads
   React.useEffect(() => {
     if (backendAISettings) {
-      setAiSettings(prev => ({
+      setAiSettings((prev) => ({
         ...prev,
         model: backendAISettings.ai_model || prev.model,
         temperature: backendAISettings.ai_temperature || prev.temperature,
         maxTokens: backendAISettings.ai_max_tokens || prev.maxTokens,
         systemPrompt: backendAISettings.system_prompt || prev.systemPrompt,
-        customInstructions: backendAISettings.custom_instructions || prev.customInstructions,
-        companyContext: backendAISettings.company_context || prev.companyContext,
+        customInstructions:
+          backendAISettings.custom_instructions || prev.customInstructions,
+        companyContext:
+          backendAISettings.company_context || prev.companyContext,
       }));
     }
   }, [backendAISettings]);
 
   // Document Settings
   const [documentSettings, setDocumentSettings] = useState({
-    defaultTemplate: 'standard',
+    defaultTemplate: "standard",
     autoSave: true,
     versionControl: true,
     collaborativeEditing: true,
-    exportFormat: 'pdf',
-    retentionPeriod: '7_years',
+    exportFormat: "pdf",
+    retentionPeriod: "7_years",
   });
 
   // Notification Settings
@@ -100,10 +103,17 @@ const SettingsPage = () => {
   // Security Settings
   const [securitySettings, setSecuritySettings] = useState({
     twoFactorAuth: false,
-    sessionTimeout: '8_hours',
-    passwordExpiry: '90_days',
+    sessionTimeout: "8_hours",
+    passwordExpiry: "90_days",
     auditLogging: true,
     dataEncryption: true,
+  });
+
+  // General Settings
+  const [generalSettings, setGeneralSettings] = useState({
+    language: "en",
+    timezone: "utc",
+    theme: "system",
   });
 
   // Mutation to save AI settings
@@ -111,57 +121,137 @@ const SettingsPage = () => {
     mutationFn: async () => {
       // Save each AI setting to the backend
       const promises = [
-        settingsAPI.upsert('ai_model', aiSettings.model, {
-          description: 'AI model to use for content generation',
-          category: 'ai',
-          type: 'string',
+        settingsAPI.upsert("ai_model", aiSettings.model, {
+          description: "AI model to use for content generation",
+          category: "ai",
+          type: "string",
         }),
-        settingsAPI.upsert('ai_temperature', aiSettings.temperature.toString(), {
-          description: 'AI temperature setting for content generation',
-          category: 'ai',
-          type: 'number',
+        settingsAPI.upsert(
+          "ai_temperature",
+          aiSettings.temperature.toString(),
+          {
+            description: "AI temperature setting for content generation",
+            category: "ai",
+            type: "number",
+          }
+        ),
+        settingsAPI.upsert("ai_max_tokens", aiSettings.maxTokens.toString(), {
+          description: "Maximum tokens for AI content generation",
+          category: "ai",
+          type: "number",
         }),
-        settingsAPI.upsert('ai_max_tokens', aiSettings.maxTokens.toString(), {
-          description: 'Maximum tokens for AI content generation',
-          category: 'ai',
-          type: 'number',
+        settingsAPI.upsert("system_prompt", aiSettings.systemPrompt, {
+          description: "System prompt for AI content generation",
+          category: "ai",
+          type: "string",
         }),
-        settingsAPI.upsert('system_prompt', aiSettings.systemPrompt, {
-          description: 'System prompt for AI content generation',
-          category: 'ai',
-          type: 'string',
-        }),
-        settingsAPI.upsert('custom_instructions', aiSettings.customInstructions, {
-          description: 'Custom instructions for AI content generation',
-          category: 'ai',
-          type: 'string',
-        }),
-        settingsAPI.upsert('company_context', aiSettings.companyContext, {
-          description: 'Company context information for AI-generated content',
-          category: 'ai',
-          type: 'string',
+        settingsAPI.upsert(
+          "custom_instructions",
+          aiSettings.customInstructions,
+          {
+            description: "Custom instructions for AI content generation",
+            category: "ai",
+            type: "string",
+          }
+        ),
+        settingsAPI.upsert("company_context", aiSettings.companyContext, {
+          description: "Company context information for AI-generated content",
+          category: "ai",
+          type: "string",
         }),
       ];
-      
+
       return Promise.all(promises);
     },
     onSuccess: () => {
-      toast.success('AI settings saved successfully!', { icon: '🤖' });
-      queryClient.invalidateQueries({ queryKey: ['settings'] });
+      toast.success("AI settings saved successfully!", { icon: "🤖" });
+      queryClient.invalidateQueries({ queryKey: ["settings"] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to save AI settings');
+      toast.error(
+        error.response?.data?.message || "Failed to save AI settings"
+      );
     },
   });
+
+  // Mutation to save general settings
+  const saveGeneralSettingsMutation = useMutation({
+    mutationFn: async () => {
+      // Save each general setting to the backend
+      const promises = [
+        settingsAPI.upsert("user_language", generalSettings.language, {
+          description: "User preferred language",
+          category: "general",
+          type: "string",
+        }),
+        settingsAPI.upsert("user_timezone", generalSettings.timezone, {
+          description: "User preferred timezone",
+          category: "general",
+          type: "string",
+        }),
+        settingsAPI.upsert("user_theme", generalSettings.theme, {
+          description: "User preferred theme (light, dark, system)",
+          category: "general",
+          type: "string",
+        }),
+      ];
+
+      return Promise.all(promises);
+    },
+    onSuccess: () => {
+      // Apply theme immediately after saving
+      applyTheme(generalSettings.theme);
+      toast.success("General settings saved successfully!", { icon: "⚙️" });
+      queryClient.invalidateQueries({ queryKey: ["settings"] });
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.response?.data?.message || "Failed to save general settings"
+      );
+    },
+  });
+
+  // Function to apply theme
+  const applyTheme = (theme: string) => {
+    const root = document.documentElement;
+
+    if (theme === "dark") {
+      root.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else if (theme === "light") {
+      root.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    } else if (theme === "system") {
+      // Use system preference
+      const systemPrefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      if (systemPrefersDark) {
+        root.classList.add("dark");
+      } else {
+        root.classList.remove("dark");
+      }
+      localStorage.setItem("theme", "system");
+    }
+  };
+
+  // Load theme on component mount
+  React.useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") || "system";
+    setGeneralSettings((prev) => ({ ...prev, theme: savedTheme }));
+    applyTheme(savedTheme);
+  }, []);
 
   const handleSaveSettings = async (settingsType: string) => {
     setIsLoading(true);
     try {
-      if (settingsType === 'AI') {
+      if (settingsType === "AI") {
         await saveAISettingsMutation.mutateAsync();
+      } else if (settingsType === "General") {
+        await saveGeneralSettingsMutation.mutateAsync();
       } else {
         // For other settings types, simulate API call for now
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         toast.success(`${settingsType} settings saved successfully!`);
       }
     } catch (error) {
@@ -194,11 +284,15 @@ const SettingsPage = () => {
       className="space-y-6"
     >
       {/* Header */}
-      <motion.div variants={itemVariants} className="flex flex-col md:flex-row items-start justify-between">
+      <motion.div
+        variants={itemVariants}
+        className="flex flex-col md:flex-row items-start justify-between"
+      >
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
           <p className="text-muted-foreground">
-            Configure your compliance platform preferences and AI model settings.
+            Configure your compliance platform preferences and AI model
+            settings.
           </p>
         </div>
         <div className="mt-4 md:mt-0">
@@ -221,7 +315,10 @@ const SettingsPage = () => {
               <Database className="h-4 w-4" />
               Documents
             </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center gap-2">
+            <TabsTrigger
+              value="notifications"
+              className="flex items-center gap-2"
+            >
               <Bell className="h-4 w-4" />
               Notifications
             </TabsTrigger>
@@ -248,15 +345,22 @@ const SettingsPage = () => {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="ai-model">AI Model</Label>
-                    <Select value={aiSettings.model} onValueChange={(value) => 
-                      setAiSettings(prev => ({ ...prev, model: value }))
-                    }>
+                    <Select
+                      value={aiSettings.model}
+                      onValueChange={(value) =>
+                        setAiSettings((prev) => ({ ...prev, model: value }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="gpt-4">GPT-4 (Recommended)</SelectItem>
-                        <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                        <SelectItem value="gpt-4">
+                          GPT-4 (Recommended)
+                        </SelectItem>
+                        <SelectItem value="gpt-3.5-turbo">
+                          GPT-3.5 Turbo
+                        </SelectItem>
                         <SelectItem value="claude-3">Claude 3</SelectItem>
                         <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
                       </SelectContent>
@@ -267,21 +371,26 @@ const SettingsPage = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="temperature">Temperature: {aiSettings.temperature}</Label>
+                    <Label htmlFor="temperature">
+                      Temperature: {aiSettings.temperature}
+                    </Label>
                     <input
                       type="range"
                       min="0"
                       max="1"
                       step="0.1"
                       value={aiSettings.temperature}
-                      onChange={(e) => setAiSettings(prev => ({ 
-                        ...prev, 
-                        temperature: parseFloat(e.target.value) 
-                      }))}
+                      onChange={(e) =>
+                        setAiSettings((prev) => ({
+                          ...prev,
+                          temperature: parseFloat(e.target.value),
+                        }))
+                      }
                       className="w-full"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Controls creativity vs consistency (0 = consistent, 1 = creative)
+                      Controls creativity vs consistency (0 = consistent, 1 =
+                      creative)
                     </p>
                   </div>
                 </div>
@@ -292,10 +401,12 @@ const SettingsPage = () => {
                     id="max-tokens"
                     type="number"
                     value={aiSettings.maxTokens}
-                    onChange={(e) => setAiSettings(prev => ({ 
-                      ...prev, 
-                      maxTokens: parseInt(e.target.value) 
-                    }))}
+                    onChange={(e) =>
+                      setAiSettings((prev) => ({
+                        ...prev,
+                        maxTokens: parseInt(e.target.value),
+                      }))
+                    }
                     min="100"
                     max="4000"
                   />
@@ -309,24 +420,30 @@ const SettingsPage = () => {
                   <Textarea
                     id="system-prompt"
                     value={aiSettings.systemPrompt}
-                    onChange={(e) => setAiSettings(prev => ({ 
-                      ...prev, 
-                      systemPrompt: e.target.value 
-                    }))}
+                    onChange={(e) =>
+                      setAiSettings((prev) => ({
+                        ...prev,
+                        systemPrompt: e.target.value,
+                      }))
+                    }
                     rows={3}
                     placeholder="Define how the AI should behave when generating compliance documents..."
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="custom-instructions">Custom Instructions</Label>
+                  <Label htmlFor="custom-instructions">
+                    Custom Instructions
+                  </Label>
                   <Textarea
                     id="custom-instructions"
                     value={aiSettings.customInstructions}
-                    onChange={(e) => setAiSettings(prev => ({ 
-                      ...prev, 
-                      customInstructions: e.target.value 
-                    }))}
+                    onChange={(e) =>
+                      setAiSettings((prev) => ({
+                        ...prev,
+                        customInstructions: e.target.value,
+                      }))
+                    }
                     rows={2}
                     placeholder="Additional instructions for your organization's specific requirements..."
                   />
@@ -337,15 +454,20 @@ const SettingsPage = () => {
                   <Textarea
                     id="company-context"
                     value={aiSettings.companyContext}
-                    onChange={(e) => setAiSettings(prev => ({ 
-                      ...prev, 
-                      companyContext: e.target.value 
-                    }))}
+                    onChange={(e) =>
+                      setAiSettings((prev) => ({
+                        ...prev,
+                        companyContext: e.target.value,
+                      }))
+                    }
                     rows={4}
                     placeholder="Describe your company (industry, size, specific requirements, etc.) to help AI generate more accurate and relevant compliance documents..."
                   />
                   <p className="text-xs text-muted-foreground">
-                    💡 Example: "We are a mid-size fintech company with 200 employees, processing credit card payments for e-commerce platforms. We operate in the US and EU markets and handle sensitive financial data."
+                    💡 Example: "We are a mid-size fintech company with 200
+                    employees, processing credit card payments for e-commerce
+                    platforms. We operate in the US and EU markets and handle
+                    sensitive financial data."
                   </p>
                 </div>
 
@@ -353,20 +475,23 @@ const SettingsPage = () => {
 
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">AI Features</h3>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label>Auto-Generation</Label>
                       <p className="text-sm text-muted-foreground">
-                        Automatically generate document content based on framework requirements
+                        Automatically generate document content based on
+                        framework requirements
                       </p>
                     </div>
                     <Switch
                       checked={aiSettings.enableAutoGeneration}
-                      onCheckedChange={(checked) => setAiSettings(prev => ({ 
-                        ...prev, 
-                        enableAutoGeneration: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setAiSettings((prev) => ({
+                          ...prev,
+                          enableAutoGeneration: checked,
+                        }))
+                      }
                     />
                   </div>
 
@@ -379,16 +504,18 @@ const SettingsPage = () => {
                     </div>
                     <Switch
                       checked={aiSettings.enableSmartSuggestions}
-                      onCheckedChange={(checked) => setAiSettings(prev => ({ 
-                        ...prev, 
-                        enableSmartSuggestions: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setAiSettings((prev) => ({
+                          ...prev,
+                          enableSmartSuggestions: checked,
+                        }))
+                      }
                     />
                   </div>
                 </div>
 
-                <Button 
-                  onClick={() => handleSaveSettings('AI')} 
+                <Button
+                  onClick={() => handleSaveSettings("AI")}
                   disabled={isLoading}
                   className="w-full"
                 >
@@ -416,16 +543,28 @@ const SettingsPage = () => {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Default Template</Label>
-                    <Select value={documentSettings.defaultTemplate} onValueChange={(value) => 
-                      setDocumentSettings(prev => ({ ...prev, defaultTemplate: value }))
-                    }>
+                    <Select
+                      value={documentSettings.defaultTemplate}
+                      onValueChange={(value) =>
+                        setDocumentSettings((prev) => ({
+                          ...prev,
+                          defaultTemplate: value,
+                        }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="standard">Standard Template</SelectItem>
-                        <SelectItem value="detailed">Detailed Template</SelectItem>
-                        <SelectItem value="minimal">Minimal Template</SelectItem>
+                        <SelectItem value="standard">
+                          Standard Template
+                        </SelectItem>
+                        <SelectItem value="detailed">
+                          Detailed Template
+                        </SelectItem>
+                        <SelectItem value="minimal">
+                          Minimal Template
+                        </SelectItem>
                         <SelectItem value="custom">Custom Template</SelectItem>
                       </SelectContent>
                     </Select>
@@ -433,9 +572,15 @@ const SettingsPage = () => {
 
                   <div className="space-y-2">
                     <Label>Export Format</Label>
-                    <Select value={documentSettings.exportFormat} onValueChange={(value) => 
-                      setDocumentSettings(prev => ({ ...prev, exportFormat: value }))
-                    }>
+                    <Select
+                      value={documentSettings.exportFormat}
+                      onValueChange={(value) =>
+                        setDocumentSettings((prev) => ({
+                          ...prev,
+                          exportFormat: value,
+                        }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -451,9 +596,15 @@ const SettingsPage = () => {
 
                 <div className="space-y-2">
                   <Label>Document Retention Period</Label>
-                  <Select value={documentSettings.retentionPeriod} onValueChange={(value) => 
-                    setDocumentSettings(prev => ({ ...prev, retentionPeriod: value }))
-                  }>
+                  <Select
+                    value={documentSettings.retentionPeriod}
+                    onValueChange={(value) =>
+                      setDocumentSettings((prev) => ({
+                        ...prev,
+                        retentionPeriod: value,
+                      }))
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -461,7 +612,9 @@ const SettingsPage = () => {
                       <SelectItem value="1_year">1 Year</SelectItem>
                       <SelectItem value="3_years">3 Years</SelectItem>
                       <SelectItem value="5_years">5 Years</SelectItem>
-                      <SelectItem value="7_years">7 Years (Recommended)</SelectItem>
+                      <SelectItem value="7_years">
+                        7 Years (Recommended)
+                      </SelectItem>
                       <SelectItem value="10_years">10 Years</SelectItem>
                       <SelectItem value="indefinite">Indefinite</SelectItem>
                     </SelectContent>
@@ -472,7 +625,7 @@ const SettingsPage = () => {
 
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Document Features</h3>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label>Auto-Save</Label>
@@ -482,10 +635,12 @@ const SettingsPage = () => {
                     </div>
                     <Switch
                       checked={documentSettings.autoSave}
-                      onCheckedChange={(checked) => setDocumentSettings(prev => ({ 
-                        ...prev, 
-                        autoSave: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setDocumentSettings((prev) => ({
+                          ...prev,
+                          autoSave: checked,
+                        }))
+                      }
                     />
                   </div>
 
@@ -498,10 +653,12 @@ const SettingsPage = () => {
                     </div>
                     <Switch
                       checked={documentSettings.versionControl}
-                      onCheckedChange={(checked) => setDocumentSettings(prev => ({ 
-                        ...prev, 
-                        versionControl: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setDocumentSettings((prev) => ({
+                          ...prev,
+                          versionControl: checked,
+                        }))
+                      }
                     />
                   </div>
 
@@ -514,16 +671,18 @@ const SettingsPage = () => {
                     </div>
                     <Switch
                       checked={documentSettings.collaborativeEditing}
-                      onCheckedChange={(checked) => setDocumentSettings(prev => ({ 
-                        ...prev, 
-                        collaborativeEditing: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setDocumentSettings((prev) => ({
+                          ...prev,
+                          collaborativeEditing: checked,
+                        }))
+                      }
                     />
                   </div>
                 </div>
 
-                <Button 
-                  onClick={() => handleSaveSettings('Document')} 
+                <Button
+                  onClick={() => handleSaveSettings("Document")}
                   disabled={isLoading}
                   className="w-full"
                 >
@@ -561,10 +720,12 @@ const SettingsPage = () => {
                     </div>
                     <Switch
                       checked={notificationSettings.emailNotifications}
-                      onCheckedChange={(checked) => setNotificationSettings(prev => ({ 
-                        ...prev, 
-                        emailNotifications: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setNotificationSettings((prev) => ({
+                          ...prev,
+                          emailNotifications: checked,
+                        }))
+                      }
                     />
                   </div>
 
@@ -580,10 +741,12 @@ const SettingsPage = () => {
                     </div>
                     <Switch
                       checked={notificationSettings.pushNotifications}
-                      onCheckedChange={(checked) => setNotificationSettings(prev => ({ 
-                        ...prev, 
-                        pushNotifications: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setNotificationSettings((prev) => ({
+                          ...prev,
+                          pushNotifications: checked,
+                        }))
+                      }
                     />
                   </div>
 
@@ -600,10 +763,12 @@ const SettingsPage = () => {
                     </div>
                     <Switch
                       checked={notificationSettings.taskReminders}
-                      onCheckedChange={(checked) => setNotificationSettings(prev => ({ 
-                        ...prev, 
-                        taskReminders: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setNotificationSettings((prev) => ({
+                          ...prev,
+                          taskReminders: checked,
+                        }))
+                      }
                     />
                   </div>
 
@@ -616,10 +781,12 @@ const SettingsPage = () => {
                     </div>
                     <Switch
                       checked={notificationSettings.documentUpdates}
-                      onCheckedChange={(checked) => setNotificationSettings(prev => ({ 
-                        ...prev, 
-                        documentUpdates: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setNotificationSettings((prev) => ({
+                          ...prev,
+                          documentUpdates: checked,
+                        }))
+                      }
                     />
                   </div>
 
@@ -632,10 +799,12 @@ const SettingsPage = () => {
                     </div>
                     <Switch
                       checked={notificationSettings.complianceAlerts}
-                      onCheckedChange={(checked) => setNotificationSettings(prev => ({ 
-                        ...prev, 
-                        complianceAlerts: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setNotificationSettings((prev) => ({
+                          ...prev,
+                          complianceAlerts: checked,
+                        }))
+                      }
                     />
                   </div>
 
@@ -648,16 +817,18 @@ const SettingsPage = () => {
                     </div>
                     <Switch
                       checked={notificationSettings.weeklyReports}
-                      onCheckedChange={(checked) => setNotificationSettings(prev => ({ 
-                        ...prev, 
-                        weeklyReports: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setNotificationSettings((prev) => ({
+                          ...prev,
+                          weeklyReports: checked,
+                        }))
+                      }
                     />
                   </div>
                 </div>
 
-                <Button 
-                  onClick={() => handleSaveSettings('Notification')} 
+                <Button
+                  onClick={() => handleSaveSettings("Notification")}
                   disabled={isLoading}
                   className="w-full"
                 >
@@ -685,9 +856,15 @@ const SettingsPage = () => {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Session Timeout</Label>
-                    <Select value={securitySettings.sessionTimeout} onValueChange={(value) => 
-                      setSecuritySettings(prev => ({ ...prev, sessionTimeout: value }))
-                    }>
+                    <Select
+                      value={securitySettings.sessionTimeout}
+                      onValueChange={(value) =>
+                        setSecuritySettings((prev) => ({
+                          ...prev,
+                          sessionTimeout: value,
+                        }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -702,9 +879,15 @@ const SettingsPage = () => {
 
                   <div className="space-y-2">
                     <Label>Password Expiry</Label>
-                    <Select value={securitySettings.passwordExpiry} onValueChange={(value) => 
-                      setSecuritySettings(prev => ({ ...prev, passwordExpiry: value }))
-                    }>
+                    <Select
+                      value={securitySettings.passwordExpiry}
+                      onValueChange={(value) =>
+                        setSecuritySettings((prev) => ({
+                          ...prev,
+                          passwordExpiry: value,
+                        }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -722,7 +905,7 @@ const SettingsPage = () => {
 
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Security Features</h3>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label className="flex items-center gap-2">
@@ -735,10 +918,12 @@ const SettingsPage = () => {
                     </div>
                     <Switch
                       checked={securitySettings.twoFactorAuth}
-                      onCheckedChange={(checked) => setSecuritySettings(prev => ({ 
-                        ...prev, 
-                        twoFactorAuth: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setSecuritySettings((prev) => ({
+                          ...prev,
+                          twoFactorAuth: checked,
+                        }))
+                      }
                     />
                   </div>
 
@@ -751,10 +936,12 @@ const SettingsPage = () => {
                     </div>
                     <Switch
                       checked={securitySettings.auditLogging}
-                      onCheckedChange={(checked) => setSecuritySettings(prev => ({ 
-                        ...prev, 
-                        auditLogging: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setSecuritySettings((prev) => ({
+                          ...prev,
+                          auditLogging: checked,
+                        }))
+                      }
                     />
                   </div>
 
@@ -770,16 +957,18 @@ const SettingsPage = () => {
                     </div>
                     <Switch
                       checked={securitySettings.dataEncryption}
-                      onCheckedChange={(checked) => setSecuritySettings(prev => ({ 
-                        ...prev, 
-                        dataEncryption: checked 
-                      }))}
+                      onCheckedChange={(checked) =>
+                        setSecuritySettings((prev) => ({
+                          ...prev,
+                          dataEncryption: checked,
+                        }))
+                      }
                     />
                   </div>
                 </div>
 
-                <Button 
-                  onClick={() => handleSaveSettings('Security')} 
+                <Button
+                  onClick={() => handleSaveSettings("Security")}
                   disabled={isLoading}
                   className="w-full"
                 >
@@ -807,7 +996,15 @@ const SettingsPage = () => {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Language</Label>
-                    <Select defaultValue="en">
+                    <Select
+                      value={generalSettings.language}
+                      onValueChange={(value) =>
+                        setGeneralSettings((prev) => ({
+                          ...prev,
+                          language: value,
+                        }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -822,7 +1019,15 @@ const SettingsPage = () => {
 
                   <div className="space-y-2">
                     <Label>Timezone</Label>
-                    <Select defaultValue="utc">
+                    <Select
+                      value={generalSettings.timezone}
+                      onValueChange={(value) =>
+                        setGeneralSettings((prev) => ({
+                          ...prev,
+                          timezone: value,
+                        }))
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -830,7 +1035,9 @@ const SettingsPage = () => {
                         <SelectItem value="utc">UTC</SelectItem>
                         <SelectItem value="est">Eastern Time</SelectItem>
                         <SelectItem value="pst">Pacific Time</SelectItem>
-                        <SelectItem value="cet">Central European Time</SelectItem>
+                        <SelectItem value="cet">
+                          Central European Time
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -838,20 +1045,54 @@ const SettingsPage = () => {
 
                 <div className="space-y-2">
                   <Label>Theme</Label>
-                  <Select defaultValue="system">
+                  <Select
+                    value={generalSettings.theme}
+                    onValueChange={(value) => {
+                      setGeneralSettings((prev) => ({ ...prev, theme: value }));
+                      // Apply theme immediately for preview
+                      applyTheme(value);
+                    }}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="light">Light</SelectItem>
-                      <SelectItem value="dark">Dark</SelectItem>
-                      <SelectItem value="system">System</SelectItem>
+                      <SelectItem value="light">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-white border border-gray-300 rounded-full"></div>
+                          Light
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="dark">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-gray-800 rounded-full"></div>
+                          Dark
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="system">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-gradient-to-r from-white to-gray-800 border border-gray-300 rounded-full"></div>
+                          System
+                        </div>
+                      </SelectItem>
                     </SelectContent>
                   </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Choose your preferred theme. System will match your device's
+                    theme.
+                  </p>
                 </div>
 
-                <Button className="w-full">
-                  <Save className="mr-2 h-4 w-4" />
+                <Button
+                  onClick={() => handleSaveSettings("General")}
+                  disabled={isLoading}
+                  className="w-full"
+                >
+                  {isLoading ? (
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="mr-2 h-4 w-4" />
+                  )}
                   Save General Settings
                 </Button>
               </CardContent>
