@@ -293,7 +293,7 @@ const RegisterPage = () => {
         {/* Footer */}
         <motion.div variants={itemVariants} className="mt-8 text-center">
           <p className="text-xs text-gray-500">
-            © 2024 Compliance Companion. Secure compliance management platform.
+            © 2025 Compliance Companion. Secure compliance management platform.
           </p>
         </motion.div>
       </motion.div>

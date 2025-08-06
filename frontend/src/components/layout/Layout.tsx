@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,17 +12,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Bell,
-  Settings,
-  Search,
-  LogOut,
-  User,
-} from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import Sidebar from './Sidebar';
-import CreateDocumentModal from '../documents/CreateDocumentModal';
+} from "@/components/ui/dropdown-menu";
+import { Bell, Settings, Search, LogOut, User } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import Sidebar from "./Sidebar";
+import CreateDocumentModal from "../documents/CreateDocumentModal";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -29,18 +24,23 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     }
   };
 
   const handleCreateDocument = () => {
     setIsCreateModalOpen(true);
+  };
+
+  const handleNavigateToSettings = () => {
+    navigate("/settings");
   };
 
   const containerVariants = {
@@ -96,21 +96,32 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Button variant="ghost" size="icon">
                 <Bell className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="icon">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleNavigateToSettings}
+              >
                 <Settings className="h-5 w-5" />
               </Button>
-              
+
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
                     <Avatar className="h-8 w-8">
                       <AvatarImage
-                        src={user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.firstName}`}
+                        src={
+                          user?.avatar ||
+                          `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.firstName}`
+                        }
                         alt={user?.firstName}
                       />
                       <AvatarFallback>
-                        {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                        {user?.firstName?.charAt(0)}
+                        {user?.lastName?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -125,7 +136,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         {user?.email}
                       </p>
                       <Badge variant="secondary" className="w-fit text-xs mt-1">
-                        {user?.role?.replace('_', ' ').toUpperCase()}
+                        {user?.role?.replace("_", " ").toUpperCase()}
                       </Badge>
                     </div>
                   </DropdownMenuLabel>
@@ -134,12 +145,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleNavigateToSettings}>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="text-red-600"
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                   </DropdownMenuItem>
@@ -149,9 +163,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </motion.header>
 
           {/* Page Content */}
-          <main className="p-6">
-            {children}
-          </main>
+          <main className="p-6">{children}</main>
         </div>
       </motion.div>
 
