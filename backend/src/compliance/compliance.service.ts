@@ -54,10 +54,16 @@ export class ComplianceService {
   }
 
   async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
-    const task = this.tasksRepository.create(createTaskDto);
+    const task = this.tasksRepository.create({
+      ...createTaskDto,
+      framework: { id: createTaskDto.frameworkId },
+      complianceProgress: { id: createTaskDto.complianceProgressId },
+      assignedTo: createTaskDto.assignedToId ? { id: createTaskDto.assignedToId } : undefined,
+    });
+    
     const savedTask = await this.tasksRepository.save(task);
 
-    // Update compliance progress
+    // Update compliance progress counts
     await this.updateProgressCounts(createTaskDto.complianceProgressId);
 
     return savedTask;

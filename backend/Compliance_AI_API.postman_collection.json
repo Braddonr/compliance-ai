@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "Compliance AI API",
+    "name": "Compliance Companion API",
     "description": "AI-Powered Compliance Copilot API - Complete collection for testing all endpoints",
     "version": "1.0.0",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"

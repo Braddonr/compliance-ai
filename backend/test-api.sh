@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🧪 Testing Compliance AI API..."
+echo "🧪 Testing Compliance Companion API..."
 echo "================================"
 
 BASE_URL="http://localhost:3000"

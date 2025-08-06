@@ -1,6 +1,6 @@
-# Compliance AI API Testing Guide
+# Compliance Companion API Testing Guide
 
-This guide will help you test the Compliance AI API using the provided Postman collection.
+This guide will help you test the Compliance Companion API using the provided Postman collection.
 
 ## 🚀 Quick Start
 

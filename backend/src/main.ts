@@ -8,7 +8,7 @@ async function bootstrap() {
 
   // Enable CORS for frontend
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173' || 'http://localhost:5174',
     credentials: true,
   });
 
@@ -23,7 +23,7 @@ async function bootstrap() {
 
   // Swagger API documentation
   const config = new DocumentBuilder()
-    .setTitle('Compliance AI API')
+    .setTitle('Compliance Companion API')
     .setDescription('AI-Powered Compliance Copilot API')
     .setVersion('1.0')
     .addBearerAuth()
