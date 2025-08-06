@@ -1,4 +1,6 @@
 import React from "react";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 import {
   Card,
   CardContent,
@@ -16,7 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Clock, Download, FileText, MoreHorizontal, Users } from "lucide-react";
+import { Clock, Download, FileText, MoreHorizontal, Users, AlertCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,133 +44,191 @@ interface Document {
 }
 
 interface DocumentGridProps {
-  documents?: Document[];
+  documents?: any[];
   onDocumentClick?: (documentId: string) => void;
   onDownload?: (documentId: string) => void;
 }
 
 const DocumentGrid: React.FC<DocumentGridProps> = ({
-  documents = defaultDocuments,
-  onDocumentClick = () => {},
-  onDownload = () => {},
+  documents = [],
+  onDocumentClick = (id) => {
+    toast.success(`Opening document: ${id}`);
+  },
+  onDownload = (id) => {
+    toast.success(`Downloading document: ${id}`);
+  },
 }) => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  if (documents.length === 0) {
+    return (
+      <div className="bg-background w-full">
+        <div className="text-center py-12">
+          <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-muted-foreground mb-2">No documents found</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Get started by creating your first compliance document.
+          </p>
+          <Button>
+            <FileText className="mr-2 h-4 w-4" />
+            Create Document
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-background w-full">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold">Recent Documents</h2>
-        <Button variant="outline">View All</Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {documents.map((doc) => (
-          <Card
-            key={doc.id}
-            className="cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => onDocumentClick(doc.id)}
-          >
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <Badge
-                  variant={getBadgeVariant(doc.framework)}
-                  className="mb-2"
-                >
-                  {doc.framework}
-                </Badge>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                      <span className="sr-only">Open menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDownload(doc.id);
-                      }}
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      Download
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <FileText className="mr-2 h-4 w-4" />
-                      View Details
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              <CardTitle className="text-lg">{doc.title}</CardTitle>
-              <CardDescription className="line-clamp-2">
-                {doc.description}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pb-2">
-              <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${getProgressColor(doc.progress)}`}
-                  style={{ width: `${doc.progress}%` }}
-                />
-              </div>
-              <div className="flex justify-between items-center mt-2 text-xs text-muted-foreground">
-                <span>{doc.progress}% Complete</span>
-                <div className="flex items-center">
-                  <Clock className="h-3 w-3 mr-1" />
-                  <span>{doc.lastUpdated}</span>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
+        {documents.map((doc, index) => (
+          <motion.div key={doc.id} variants={itemVariants}>
+            <Card
+              className="cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200 border-0 shadow-md"
+              onClick={() => onDocumentClick(doc.id)}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start">
+                  <Badge
+                    variant={getBadgeVariant(doc.framework?.displayName || doc.framework?.name)}
+                    className="mb-2"
+                  >
+                    {doc.framework?.displayName || doc.framework?.name}
+                  </Badge>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">Open menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDownload(doc.id);
+                        }}
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Download
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDocumentClick(doc.id);
+                        }}
+                      >
+                        <FileText className="mr-2 h-4 w-4" />
+                        View Details
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-              </div>
-            </CardContent>
-            <CardFooter className="pt-2">
-              <div className="flex justify-between items-center w-full">
-                <div className="flex -space-x-2">
-                  <TooltipProvider>
-                    {doc.collaborators.slice(0, 3).map((collaborator) => (
-                      <Tooltip key={collaborator.id}>
-                        <TooltipTrigger asChild>
-                          <Avatar className="h-7 w-7 border-2 border-background">
-                            {collaborator.avatar && (
-                              <AvatarImage
-                                src={collaborator.avatar}
-                                alt={collaborator.name}
-                              />
-                            )}
-                            <AvatarFallback className="text-xs">
-                              {collaborator.initials}
-                            </AvatarFallback>
-                          </Avatar>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>{collaborator.name}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    ))}
-                    {doc.collaborators.length > 3 && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Avatar className="h-7 w-7 border-2 border-background">
-                            <AvatarFallback className="text-xs bg-muted">
-                              +{doc.collaborators.length - 3}
-                            </AvatarFallback>
-                          </Avatar>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>
-                            {doc.collaborators.length - 3} more collaborators
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    )}
-                  </TooltipProvider>
+                <CardTitle className="text-lg line-clamp-2">{doc.title}</CardTitle>
+                <CardDescription className="line-clamp-2">
+                  {doc.description || 'No description available'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pb-2">
+                <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${doc.progress || 0}%` }}
+                    transition={{ duration: 0.8, delay: index * 0.1 }}
+                    className={`h-full ${getProgressColor(doc.progress || 0)}`}
+                  />
                 </div>
-                <div className="flex items-center text-xs text-muted-foreground">
-                  <Users className="h-3 w-3 mr-1" />
-                  <span>{doc.collaborators.length} collaborators</span>
+                <div className="flex justify-between items-center mt-2 text-xs text-muted-foreground">
+                  <span>{Math.round(doc.progress || 0)}% Complete</span>
+                  <div className="flex items-center">
+                    <Clock className="h-3 w-3 mr-1" />
+                    <span>
+                      {doc.lastUpdated || 
+                       (doc.updatedAt ? new Date(doc.updatedAt).toLocaleDateString() : 'Unknown')}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </CardFooter>
-          </Card>
+              </CardContent>
+              <CardFooter className="pt-2">
+                <div className="flex justify-between items-center w-full">
+                  <div className="flex -space-x-2">
+                    <TooltipProvider>
+                      {doc.collaborators && doc.collaborators.length > 0 ? (
+                        <>
+                          {doc.collaborators.slice(0, 3).map((collaborator: any) => (
+                            <Tooltip key={collaborator.id}>
+                              <TooltipTrigger asChild>
+                                <Avatar className="h-7 w-7 border-2 border-background">
+                                  <AvatarImage
+                                    src={collaborator.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${collaborator.firstName}`}
+                                    alt={`${collaborator.firstName} ${collaborator.lastName}`}
+                                  />
+                                  <AvatarFallback className="text-xs">
+                                    {collaborator.firstName?.charAt(0)}{collaborator.lastName?.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{collaborator.firstName} {collaborator.lastName}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          ))}
+                          {doc.collaborators.length > 3 && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Avatar className="h-7 w-7 border-2 border-background">
+                                  <AvatarFallback className="text-xs bg-muted">
+                                    +{doc.collaborators.length - 3}
+                                  </AvatarFallback>
+                                </Avatar>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
+                                  {doc.collaborators.length - 3} more collaborators
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </>
+                      ) : (
+                        <Avatar className="h-7 w-7 border-2 border-background">
+                          <AvatarFallback className="text-xs bg-muted">
+                            {doc.createdBy?.firstName?.charAt(0)}{doc.createdBy?.lastName?.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                      )}
+                    </TooltipProvider>
+                  </div>
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    <Users className="h-3 w-3 mr-1" />
+                    <span>
+                      {doc.collaborators?.length || 0} collaborator{(doc.collaborators?.length || 0) !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                </div>
+              </CardFooter>
+            </Card>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 };

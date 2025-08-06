@@ -26,9 +26,9 @@ async function bootstrap() {
 
   // Swagger API documentation
   const config = new DocumentBuilder()
-    .setTitle("Compliance Companion API")
-    .setDescription("AI-Powered Compliance Copilot API")
-    .setVersion("1.0")
+    .setTitle('Compliance Companion API')
+    .setDescription('AI-Powered Compliance Copilot API')
+    .setVersion('1.0')
     .addBearerAuth()
     .build();
 

@@ -8,6 +8,7 @@ import { DocumentsModule } from './documents/documents.module';
 import { CollaborationModule } from './collaboration/collaboration.module';
 import { AiModule } from './ai/ai.module';
 import { DatabaseModule } from './database/database.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { DatabaseModule } from './database/database.module';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT) || 5432,
+      port: parseInt(process.env.DB_PORT || '5432'),
       username: process.env.DB_USERNAME || 'postgres',
       password: process.env.DB_PASSWORD || 'password',
       database: process.env.DB_NAME || 'compliance_ai',
@@ -36,6 +37,7 @@ import { DatabaseModule } from './database/database.module';
     CollaborationModule,
     AiModule,
     DatabaseModule,
+    SettingsModule,
   ],
 })
 export class AppModule {}
