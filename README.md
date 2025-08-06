@@ -90,6 +90,4 @@ Versioning of compliance docs with diff viewer
 
 Optional PDF/Markdown export with digital signatures
 
-💼 How to pitch it on your resume:
 
-“Built an AI-powered SaaS compliance assistant for fintech startups, enabling automated PCI/SOC2 documentation generation with real-time team collaboration and audit trails. Integrated OpenAI LLMs, nest js backend, WebSocket-based real-time editing, and secure AWS cloud deployment.”
