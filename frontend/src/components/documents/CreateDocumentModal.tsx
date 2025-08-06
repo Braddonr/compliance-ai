@@ -29,7 +29,7 @@ import {
   X,
   Wand2,
 } from 'lucide-react';
-import { documentsAPI, complianceAPI, aiAPI } from '@/lib/api';
+import { documentsAPI, complianceAPI, aiAPI, settingsAPI } from '@/lib/api';
 
 const createDocumentSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -88,6 +88,13 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
     queryFn: complianceAPI.getFrameworks,
   });
 
+  // Fetch company context from settings
+  const { data: companyContext } = useQuery({
+    queryKey: ['settings', 'company-context'],
+    queryFn: settingsAPI.getCompanyContext,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
   // Create document mutation
   const createMutation = useMutation({
     mutationFn: (data: any) => documentsAPI.create(data),
@@ -103,7 +110,13 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
 
   // AI generation mutation
   const generateMutation = useMutation({
-    mutationFn: (prompt: any) => aiAPI.generateDocument(prompt.framework, prompt.requirements),
+    mutationFn: (data: {
+      framework: string;
+      requirements: string[];
+      title?: string;
+      description?: string;
+      companyContext?: string;
+    }) => aiAPI.generateDocument(data),
     onSuccess: (data) => {
       setAiGeneratedContent(data);
       setValue('content', data);
@@ -161,10 +174,8 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
     setIsGenerating(true);
     const selectedFramework = frameworks?.find(f => f.id === watchedFramework);
     
-    // Create a comprehensive prompt for the AI
-    const prompt = {
-      title,
-      description: description || '',
+    // Create a comprehensive prompt for the AI with company context
+    const aiData = {
       framework: selectedFramework?.displayName || selectedFramework?.name || '',
       requirements: customRequirements.length > 0 ? customRequirements : [
         'Security Controls',
@@ -172,9 +183,12 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
         'Documentation Requirements',
         'Compliance Monitoring',
       ],
+      title,
+      description: description || '',
+      companyContext: companyContext || '', // Include company context from settings
     };
     
-    generateMutation.mutate(prompt);
+    generateMutation.mutate(aiData);
   };
 
   const onSubmit = (data: CreateDocumentFormData) => {

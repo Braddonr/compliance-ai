@@ -8,6 +8,7 @@ import { DocumentsModule } from './documents/documents.module';
 import { CollaborationModule } from './collaboration/collaboration.module';
 import { AiModule } from './ai/ai.module';
 import { DatabaseModule } from './database/database.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { DatabaseModule } from './database/database.module';
     CollaborationModule,
     AiModule,
     DatabaseModule,
+    SettingsModule,
   ],
 })
 export class AppModule {}

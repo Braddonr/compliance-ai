@@ -160,10 +160,85 @@ export const documentsAPI = {
   },
 };
 
+// Settings API
+export const settingsAPI = {
+  getAll: async () => {
+    const response = await api.get('/settings');
+    return response.data;
+  },
+  
+  getByCategory: async (category: string) => {
+    const response = await api.get(`/settings/category/${category}`);
+    return response.data;
+  },
+  
+  getAISettings: async () => {
+    const response = await api.get('/settings/ai');
+    return response.data;
+  },
+  
+  getByKey: async (key: string) => {
+    const response = await api.get(`/settings/${key}`);
+    return response.data;
+  },
+  
+  create: async (settingData: {
+    key: string;
+    value: string;
+    description?: string;
+    type?: 'string' | 'number' | 'boolean' | 'json';
+    category?: string;
+  }) => {
+    const response = await api.post('/settings', settingData);
+    return response.data;
+  },
+  
+  update: async (key: string, updateData: {
+    value?: string;
+    description?: string;
+    type?: 'string' | 'number' | 'boolean' | 'json';
+    category?: string;
+  }) => {
+    const response = await api.put(`/settings/${key}`, updateData);
+    return response.data;
+  },
+  
+  upsert: async (key: string, value: string, options?: any) => {
+    const response = await api.post('/settings/upsert', { key, value, options });
+    return response.data;
+  },
+  
+  delete: async (key: string) => {
+    const response = await api.delete(`/settings/${key}`);
+    return response.data;
+  },
+  
+  getCompanyContext: async () => {
+    const response = await api.get('/settings/ai/company-context');
+    return response.data;
+  },
+  
+  setCompanyContext: async (context: string) => {
+    const response = await api.post('/settings/ai/company-context', { context });
+    return response.data;
+  },
+  
+  initializeDefaults: async () => {
+    const response = await api.post('/settings/initialize');
+    return response.data;
+  },
+};
+
 // AI API
 export const aiAPI = {
-  generateDocument: async (framework: string, requirements: string[]) => {
-    const response = await api.post('/ai/generate-document', { framework, requirements });
+  generateDocument: async (data: {
+    framework: string;
+    requirements: string[];
+    title?: string;
+    description?: string;
+    companyContext?: string;
+  }) => {
+    const response = await api.post('/ai/generate-document', data);
     return response.data;
   },
   

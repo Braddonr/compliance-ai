@@ -34,11 +34,21 @@ import {
   Smartphone,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { settingsAPI } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 const SettingsPage = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch existing AI settings from backend
+  const { data: backendAISettings, isLoading: settingsLoading } = useQuery({
+    queryKey: ['settings', 'ai'],
+    queryFn: settingsAPI.getAISettings,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
 
   // AI Model Settings
   const [aiSettings, setAiSettings] = useState({
@@ -49,7 +59,23 @@ const SettingsPage = () => {
     enableAutoGeneration: true,
     enableSmartSuggestions: true,
     customInstructions: '',
+    companyContext: '',
   });
+
+  // Update local state when backend data loads
+  React.useEffect(() => {
+    if (backendAISettings) {
+      setAiSettings(prev => ({
+        ...prev,
+        model: backendAISettings.ai_model || prev.model,
+        temperature: backendAISettings.ai_temperature || prev.temperature,
+        maxTokens: backendAISettings.ai_max_tokens || prev.maxTokens,
+        systemPrompt: backendAISettings.system_prompt || prev.systemPrompt,
+        customInstructions: backendAISettings.custom_instructions || prev.customInstructions,
+        companyContext: backendAISettings.company_context || prev.companyContext,
+      }));
+    }
+  }, [backendAISettings]);
 
   // Document Settings
   const [documentSettings, setDocumentSettings] = useState({
@@ -80,14 +106,66 @@ const SettingsPage = () => {
     dataEncryption: true,
   });
 
+  // Mutation to save AI settings
+  const saveAISettingsMutation = useMutation({
+    mutationFn: async () => {
+      // Save each AI setting to the backend
+      const promises = [
+        settingsAPI.upsert('ai_model', aiSettings.model, {
+          description: 'AI model to use for content generation',
+          category: 'ai',
+          type: 'string',
+        }),
+        settingsAPI.upsert('ai_temperature', aiSettings.temperature.toString(), {
+          description: 'AI temperature setting for content generation',
+          category: 'ai',
+          type: 'number',
+        }),
+        settingsAPI.upsert('ai_max_tokens', aiSettings.maxTokens.toString(), {
+          description: 'Maximum tokens for AI content generation',
+          category: 'ai',
+          type: 'number',
+        }),
+        settingsAPI.upsert('system_prompt', aiSettings.systemPrompt, {
+          description: 'System prompt for AI content generation',
+          category: 'ai',
+          type: 'string',
+        }),
+        settingsAPI.upsert('custom_instructions', aiSettings.customInstructions, {
+          description: 'Custom instructions for AI content generation',
+          category: 'ai',
+          type: 'string',
+        }),
+        settingsAPI.upsert('company_context', aiSettings.companyContext, {
+          description: 'Company context information for AI-generated content',
+          category: 'ai',
+          type: 'string',
+        }),
+      ];
+      
+      return Promise.all(promises);
+    },
+    onSuccess: () => {
+      toast.success('AI settings saved successfully!', { icon: '🤖' });
+      queryClient.invalidateQueries({ queryKey: ['settings'] });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to save AI settings');
+    },
+  });
+
   const handleSaveSettings = async (settingsType: string) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success(`${settingsType} settings saved successfully!`);
+      if (settingsType === 'AI') {
+        await saveAISettingsMutation.mutateAsync();
+      } else {
+        // For other settings types, simulate API call for now
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        toast.success(`${settingsType} settings saved successfully!`);
+      }
     } catch (error) {
-      toast.error('Failed to save settings');
+      // Error is handled by the mutation
     } finally {
       setIsLoading(false);
     }
@@ -252,6 +330,23 @@ const SettingsPage = () => {
                     rows={2}
                     placeholder="Additional instructions for your organization's specific requirements..."
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="company-context">Company Context</Label>
+                  <Textarea
+                    id="company-context"
+                    value={aiSettings.companyContext}
+                    onChange={(e) => setAiSettings(prev => ({ 
+                      ...prev, 
+                      companyContext: e.target.value 
+                    }))}
+                    rows={4}
+                    placeholder="Describe your company (industry, size, specific requirements, etc.) to help AI generate more accurate and relevant compliance documents..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    💡 Example: "We are a mid-size fintech company with 200 employees, processing credit card payments for e-commerce platforms. We operate in the US and EU markets and handle sensitive financial data."
+                  </p>
                 </div>
 
                 <Separator />
