@@ -57,10 +57,6 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
     queryKey: ["document", documentId],
     queryFn: () => documentsAPI.getById(documentId!),
     enabled: !!documentId && isOpen,
-    onSuccess: (data) => {
-      setEditedContent(data.content || "");
-      setEditedTitle(data.title || "");
-    },
   });
 
   // Fetch document versions
@@ -98,6 +94,15 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
   useEffect(() => {
     setIsEditing(startInEditMode);
   }, [startInEditMode, isOpen]);
+
+  // Reset content when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setEditedContent("");
+      setEditedTitle("");
+      setIsEditing(false);
+    }
+  }, [isOpen]);
 
   const handleSave = () => {
     if (!editedTitle.trim()) {
@@ -327,12 +332,15 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
                     value="content"
                     className="flex-1 overflow-auto p-6 pt-4"
                   >
-                    <RichTextEditor
-                      content={editedContent}
-                      onChange={setEditedContent}
-                      editable={isEditing}
-                      placeholder="Start writing your compliance document..."
-                    />
+                    {document && (
+                      <RichTextEditor
+                        key={`${documentId}-${document.updatedAt}`}
+                        content={editedContent}
+                        onChange={setEditedContent}
+                        editable={isEditing}
+                        placeholder="Start writing your compliance document..."
+                      />
+                    )}
                   </TabsContent>
 
                   <TabsContent
