@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Select,
   SelectContent,
@@ -217,10 +218,10 @@ const DocumentsPage = () => {
                           </p>
                           
                           <div className="space-y-2 text-xs text-muted-foreground">
-                            <div className="flex items-center gap-2">
+                            {/* <div className="flex items-center gap-2">
                               <User className="h-3 w-3" />
                               <span>{document.author?.firstName} {document.author?.lastName}</span>
-                            </div>
+                            </div> */}
                             <div className="flex items-center gap-2">
                               <Calendar className="h-3 w-3" />
                               <span>{new Date(document.updatedAt).toLocaleDateString()}</span>
@@ -230,6 +231,33 @@ const DocumentsPage = () => {
                                 <Badge variant="outline" className="text-xs">
                                   {document.framework.displayName}
                                 </Badge>
+                              </div>
+                            )}
+                            {/* Contributors */}
+                            {document.collaborators && document.collaborators.length > 0 && (
+                              <div className="flex items-center gap-2">
+                                <User className="h-3 w-3" />
+                                <span className="text-xs">Collaborator(s):</span>
+                                <div className="flex -space-x-1">
+                                  {document.collaborators.slice(0, 3).map((collaborator: any) => (
+                                    <Avatar key={collaborator.id} className="h-5 w-5 border border-background">
+                                      <AvatarImage
+                                        src={collaborator.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${collaborator.firstName}`}
+                                        alt={`${collaborator.firstName} ${collaborator.lastName}`}
+                                      />
+                                      <AvatarFallback className="text-xs">
+                                        {collaborator.firstName?.charAt(0)}{collaborator.lastName?.charAt(0)}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                  ))}
+                                  {document.collaborators.length > 3 && (
+                                    <Avatar className="h-5 w-5 border border-background">
+                                      <AvatarFallback className="text-xs bg-muted">
+                                        +{document.collaborators.length - 3}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                  )}
+                                </div>
                               </div>
                             )}
                           </div>
