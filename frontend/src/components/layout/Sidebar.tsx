@@ -215,7 +215,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCreateDocument }) => {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="ml-4 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                onClick={() => navigate(`/frameworks/${progress.framework?.id}`)}
+                onClick={() => navigate(`/documents?framework=${progress.framework?.id}`)}
               >
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">

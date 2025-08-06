@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -32,12 +33,22 @@ import ExportReportModal from '../reports/ExportReportModal';
 import toast from 'react-hot-toast';
 
 const DocumentsPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedFramework, setSelectedFramework] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null);
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
+  const [startInEditMode, setStartInEditMode] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  // Handle URL parameters for framework filtering
+  useEffect(() => {
+    const frameworkParam = searchParams.get('framework');
+    if (frameworkParam) {
+      setSelectedFramework(frameworkParam);
+    }
+  }, [searchParams]);
 
   // Fetch frameworks
   const { data: frameworks } = useQuery({
@@ -58,8 +69,9 @@ const DocumentsPage = () => {
     },
   });
 
-  const handleDocumentClick = (documentId: string) => {
+  const handleDocumentClick = (documentId: string, editMode = false) => {
     setSelectedDocumentId(documentId);
+    setStartInEditMode(editMode);
     setIsDocumentModalOpen(true);
   };
 
@@ -238,7 +250,7 @@ const DocumentsPage = () => {
                               variant="outline"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                // TODO: Implement edit functionality
+                                handleDocumentClick(document.id, true);
                               }}
                               className="flex-1"
                             >
@@ -280,16 +292,18 @@ const DocumentsPage = () => {
       <DocumentViewModal
         documentId={selectedDocumentId}
         isOpen={isDocumentModalOpen}
+        startInEditMode={startInEditMode}
         onClose={() => {
           setIsDocumentModalOpen(false);
           setSelectedDocumentId(null);
+          setStartInEditMode(false);
         }}
       />
       
       <CreateDocumentModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        organizationId="default-org-id"
+        organizationId="203ed168-e9d5-42a4-809c-a09f5952d697"
       />
     </>
   );

@@ -192,7 +192,7 @@ const Home = () => {
       <CreateDocumentModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        organizationId="default-org-id"
+        organizationId="203ed168-e9d5-42a4-809c-a09f5952d697"
       />
 
       <ExportReportModal

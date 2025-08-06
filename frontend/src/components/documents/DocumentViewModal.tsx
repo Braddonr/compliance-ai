@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import RichTextEditor from '@/components/ui/rich-text-editor';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import RichTextEditor from "@/components/ui/rich-text-editor";
 import {
   Edit3,
   Save,
@@ -27,39 +27,45 @@ import {
   Download,
   Share,
   Loader2,
-} from 'lucide-react';
-import { documentsAPI } from '@/lib/api';
+} from "lucide-react";
+import { documentsAPI } from "@/lib/api";
 
 interface DocumentViewModalProps {
   documentId: string | null;
   isOpen: boolean;
   onClose: () => void;
+  startInEditMode?: boolean;
 }
 
 const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
   documentId,
   isOpen,
   onClose,
+  startInEditMode = false,
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedContent, setEditedContent] = useState('');
-  const [editedTitle, setEditedTitle] = useState('');
+  const [isEditing, setIsEditing] = useState(startInEditMode);
+  const [editedContent, setEditedContent] = useState("");
+  const [editedTitle, setEditedTitle] = useState("");
   const queryClient = useQueryClient();
 
   // Fetch document details
-  const { data: document, isLoading, error } = useQuery({
-    queryKey: ['document', documentId],
+  const {
+    data: document,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["document", documentId],
     queryFn: () => documentsAPI.getById(documentId!),
     enabled: !!documentId && isOpen,
     onSuccess: (data) => {
-      setEditedContent(data.content || '');
-      setEditedTitle(data.title || '');
+      setEditedContent(data.content || "");
+      setEditedTitle(data.title || "");
     },
   });
 
   // Fetch document versions
   const { data: versions } = useQuery({
-    queryKey: ['document-versions', documentId],
+    queryKey: ["document-versions", documentId],
     queryFn: () => documentsAPI.getVersions(documentId!),
     enabled: !!documentId && isOpen,
   });
@@ -69,59 +75,65 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
     mutationFn: (data: { title: string; content: string; changeLog: string }) =>
       documentsAPI.update(documentId!, data),
     onSuccess: () => {
-      toast.success('Document updated successfully!', { icon: '✅' });
+      toast.success("Document updated successfully!", { icon: "✅" });
       setIsEditing(false);
-      queryClient.invalidateQueries({ queryKey: ['document', documentId] });
-      queryClient.invalidateQueries({ queryKey: ['documents'] });
-      queryClient.invalidateQueries({ queryKey: ['document-versions', documentId] });
+      queryClient.invalidateQueries({ queryKey: ["document", documentId] });
+      queryClient.invalidateQueries({ queryKey: ["documents"] });
+      queryClient.invalidateQueries({
+        queryKey: ["document-versions", documentId],
+      });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to update document');
+      toast.error(error.response?.data?.message || "Failed to update document");
     },
   });
 
   useEffect(() => {
     if (document) {
-      setEditedContent(document.content || '');
-      setEditedTitle(document.title || '');
+      setEditedContent(document.content || "");
+      setEditedTitle(document.title || "");
     }
   }, [document]);
 
+  useEffect(() => {
+    setIsEditing(startInEditMode);
+  }, [startInEditMode, isOpen]);
+
   const handleSave = () => {
     if (!editedTitle.trim()) {
-      toast.error('Document title is required');
+      toast.error("Document title is required");
       return;
     }
 
     updateMutation.mutate({
       title: editedTitle,
       content: editedContent,
-      changeLog: 'Document updated via web interface',
+      changeLog: "Document updated via web interface",
     });
   };
 
   const handleDownload = () => {
-    toast.success('Download started!', { icon: '📥' });
+    toast.success("Download started!", { icon: "📥" });
     // Implement actual download logic here
   };
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
-    toast.success('Document link copied to clipboard!', { icon: '📋' });
+    toast.success("Document link copied to clipboard!", { icon: "📋" });
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'published':
-        return 'bg-green-100 text-green-800';
-      case 'in_review':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'approved':
-        return 'bg-blue-100 text-blue-800';
-      case 'draft':
-        return 'bg-gray-100 text-gray-800';
+      case "published":
+        return "bg-green-100 text-green-800";
+      case "in_review":
+        return "bg-yellow-100 text-yellow-800";
+      case "approved":
+        return "bg-blue-100 text-blue-800";
+      case "draft":
+        return "bg-gray-100 text-gray-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -159,9 +171,9 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
               className="flex flex-col h-full"
             >
               {/* Header */}
-              <div className="p-6 border-b">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
+              <div className="p-6 border-b pr-16">
+                <div className="flex items-start justify-between gap-6">
+                  <div className="flex-1 min-w-0">
                     {isEditing ? (
                       <input
                         type="text"
@@ -174,19 +186,20 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
                         {document?.title}
                       </DialogTitle>
                     )}
-                    <DialogDescription className="mt-2 flex items-center gap-4">
+                    <DialogDescription className="mt-2 flex items-center gap-4 flex-wrap">
                       <Badge className={getStatusColor(document?.status)}>
-                        {document?.status?.replace('_', ' ').toUpperCase()}
+                        {document?.status?.replace("_", " ").toUpperCase()}
                       </Badge>
                       <Badge variant="outline">
                         {document?.framework?.displayName}
                       </Badge>
                       <span className="text-sm text-muted-foreground">
-                        Last updated: {new Date(document?.updatedAt).toLocaleDateString()}
+                        Last updated:{" "}
+                        {new Date(document?.updatedAt).toLocaleDateString()}
                       </span>
                     </DialogDescription>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0 mr-2">
                     {isEditing ? (
                       <>
                         <Button
@@ -205,8 +218,8 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
                           variant="outline"
                           onClick={() => {
                             setIsEditing(false);
-                            setEditedContent(document?.content || '');
-                            setEditedTitle(document?.title || '');
+                            setEditedContent(document?.content || "");
+                            setEditedTitle(document?.title || "");
                           }}
                           size="sm"
                         >
@@ -216,11 +229,19 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
                       </>
                     ) : (
                       <>
-                        <Button variant="outline" onClick={handleDownload} size="sm">
+                        <Button
+                          variant="outline"
+                          onClick={handleDownload}
+                          size="sm"
+                        >
                           <Download className="h-4 w-4 mr-2" />
                           Download
                         </Button>
-                        <Button variant="outline" onClick={handleShare} size="sm">
+                        <Button
+                          variant="outline"
+                          onClick={handleShare}
+                          size="sm"
+                        >
                           <Share className="h-4 w-4 mr-2" />
                           Share
                         </Button>
@@ -238,7 +259,10 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">Progress:</span>
-                      <Progress value={document?.progress || 0} className="w-32" />
+                      <Progress
+                        value={document?.progress || 0}
+                        className="w-32"
+                      />
                       <span className="text-sm text-muted-foreground">
                         {Math.round(document?.progress || 0)}%
                       </span>
@@ -247,17 +271,26 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-muted-foreground" />
                     <div className="flex -space-x-2">
-                      {document?.collaborators?.slice(0, 3).map((collaborator: any) => (
-                        <Avatar key={collaborator.id} className="h-6 w-6 border-2 border-background">
-                          <AvatarImage
-                            src={collaborator.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${collaborator.firstName}`}
-                            alt={`${collaborator.firstName} ${collaborator.lastName}`}
-                          />
-                          <AvatarFallback className="text-xs">
-                            {collaborator.firstName?.charAt(0)}{collaborator.lastName?.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                      ))}
+                      {document?.collaborators
+                        ?.slice(0, 3)
+                        .map((collaborator: any) => (
+                          <Avatar
+                            key={collaborator.id}
+                            className="h-6 w-6 border-2 border-background"
+                          >
+                            <AvatarImage
+                              src={
+                                collaborator.avatar ||
+                                `https://api.dicebear.com/7.x/avataaars/svg?seed=${collaborator.firstName}`
+                              }
+                              alt={`${collaborator.firstName} ${collaborator.lastName}`}
+                            />
+                            <AvatarFallback className="text-xs">
+                              {collaborator.firstName?.charAt(0)}
+                              {collaborator.lastName?.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                        ))}
                       {(document?.collaborators?.length || 0) > 3 && (
                         <Avatar className="h-6 w-6 border-2 border-background">
                           <AvatarFallback className="text-xs bg-muted">
@@ -274,17 +307,26 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
               <div className="flex-1 overflow-hidden">
                 <Tabs defaultValue="content" className="h-full flex flex-col">
                   <TabsList className="mx-6 mt-4 w-fit">
-                    <TabsTrigger value="content" className="flex items-center gap-2">
+                    <TabsTrigger
+                      value="content"
+                      className="flex items-center gap-2"
+                    >
                       <FileText className="h-4 w-4" />
                       Content
                     </TabsTrigger>
-                    <TabsTrigger value="versions" className="flex items-center gap-2">
+                    <TabsTrigger
+                      value="versions"
+                      className="flex items-center gap-2"
+                    >
                       <History className="h-4 w-4" />
                       Versions ({versions?.length || 0})
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="content" className="flex-1 overflow-auto p-6 pt-4">
+                  <TabsContent
+                    value="content"
+                    className="flex-1 overflow-auto p-6 pt-4"
+                  >
                     <RichTextEditor
                       content={editedContent}
                       onChange={setEditedContent}
@@ -293,7 +335,10 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
                     />
                   </TabsContent>
 
-                  <TabsContent value="versions" className="flex-1 overflow-auto p-6 pt-4">
+                  <TabsContent
+                    value="versions"
+                    className="flex-1 overflow-auto p-6 pt-4"
+                  >
                     <div className="space-y-4">
                       {versions?.map((version: any, index: number) => (
                         <motion.div
@@ -305,9 +350,12 @@ const DocumentViewModal: React.FC<DocumentViewModalProps> = ({
                         >
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                              <Badge variant="outline">v{version.version}</Badge>
+                              <Badge variant="outline">
+                                v{version.version}
+                              </Badge>
                               <span className="text-sm font-medium">
-                                {version.createdBy?.firstName} {version.createdBy?.lastName}
+                                {version.createdBy?.firstName}{" "}
+                                {version.createdBy?.lastName}
                               </span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">

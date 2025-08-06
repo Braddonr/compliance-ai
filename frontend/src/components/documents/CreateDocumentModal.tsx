@@ -36,8 +36,8 @@ const createDocumentSchema = z.object({
   description: z.string().optional(),
   frameworkId: z.string().min(1, 'Framework is required'),
   content: z.string().min(1, 'Content is required'),
-  requirements: z.array(z.string()).optional(),
-  useAI: z.boolean().optional(),
+  requirements: z.array(z.string()).optional(), // Used for AI generation only
+  useAI: z.boolean().optional(), // Used for UI state only
 });
 
 type CreateDocumentFormData = z.infer<typeof createDocumentSchema>;
@@ -192,13 +192,19 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
   };
 
   const onSubmit = (data: CreateDocumentFormData) => {
-    createMutation.mutate({
-      ...data,
-      organizationId,
+    // Create the document data structure expected by the backend
+    const documentData = {
+      title: data.title,
+      description: data.description || '',
+      content: data.content,
+      frameworkId: data.frameworkId, // This should be the UUID of the framework
+      organizationId: organizationId || '203ed168-e9d5-42a4-809c-a09f5952d697', // Use default org ID if not provided
       progress: 0,
-      status: 'draft',
+      status: 'draft' as const,
       changeLog: 'Initial document creation',
-    });
+    };
+    
+    createMutation.mutate(documentData);
   };
 
   const commonRequirements = {
