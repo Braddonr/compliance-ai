@@ -29,42 +29,93 @@ export class SeederService {
   async seed(): Promise<void> {
     console.log('🌱 Starting database seeding...');
 
-    // Create organization
-    const organization = await this.createOrganization();
-    
-    // Create frameworks
-    const frameworks = await this.createFrameworks();
-    
-    // Create users
-    const users = await this.createUsers(organization);
-    
-    // Create compliance progress
-    const progressRecords = await this.createComplianceProgress(organization, frameworks);
-    
-    // Create tasks
-    await this.createTasks(frameworks, progressRecords, users);
-    
-    // Create documents
-    await this.createDocuments(organization, frameworks, users);
+    try {
+      // Step 1: Create organization
+      console.log('📊 Step 1: Creating organization...');
+      const organization = await this.createOrganization();
+      if (!organization || !organization.id) {
+        throw new Error('Failed to create organization - no ID returned');
+      }
+      console.log(`✅ Organization created: ${organization.name} (ID: ${organization.id})`);
+      
+      // Step 2: Create frameworks
+      console.log('📋 Step 2: Creating frameworks...');
+      const frameworks = await this.createFrameworks();
+      if (!frameworks || frameworks.length === 0) {
+        throw new Error('Failed to create frameworks - empty array returned');
+      }
+      console.log(`✅ Created ${frameworks.length} frameworks`);
+      
+      // Validate frameworks have IDs
+      for (const framework of frameworks) {
+        if (!framework || !framework.id) {
+          throw new Error(`Framework missing ID: ${JSON.stringify(framework)}`);
+        }
+      }
+      
+      // Step 3: Create users
+      console.log('👥 Step 3: Creating users...');
+      const users = await this.createUsers(organization);
+      if (!users || users.length === 0) {
+        throw new Error('Failed to create users - empty array returned');
+      }
+      console.log(`✅ Created ${users.length} users`);
+      
+      // Validate users have IDs
+      for (const user of users) {
+        if (!user || !user.id) {
+          throw new Error(`User missing ID: ${JSON.stringify(user)}`);
+        }
+      }
+      
+      // Step 4: Create compliance progress
+      console.log('📈 Step 4: Creating compliance progress records...');
+      const progressRecords = await this.createComplianceProgress(organization, frameworks);
+      console.log(`✅ Created ${progressRecords.length} progress records`);
+      
+      // Step 5: Create tasks
+      console.log('📝 Step 5: Creating tasks...');
+      await this.createTasks(frameworks, progressRecords, users);
+      console.log('✅ Tasks created successfully');
+      
+      // Step 6: Create documents
+      console.log('📄 Step 6: Creating documents...');
+      await this.createDocuments(organization, frameworks, users);
+      console.log('✅ Documents created successfully');
 
-    console.log('✅ Database seeding completed!');
+      console.log('✅ Database seeding completed successfully!');
+    } catch (error) {
+      console.error('❌ Database seeding failed at step:', error.message);
+      console.error('Full error:', error);
+      throw error;
+    }
   }
 
   private async createOrganization(): Promise<Organization> {
-    const existing = await this.organizationsRepository.findOne({
-      where: { name: 'Demo Fintech Company' },
-    });
+    try {
+      const existing = await this.organizationsRepository.findOne({
+        where: { name: 'Demo Fintech Company' },
+      });
 
-    if (existing) return existing;
+      if (existing) {
+        console.log('Organization already exists:', existing.id);
+        return existing;
+      }
 
-    const organization = this.organizationsRepository.create({
-      name: 'Demo Fintech Company',
-      description: 'A sample fintech company for compliance demonstration',
-      website: 'https://demo-fintech.com',
-      industry: 'Financial Technology',
-    });
+      const organization = this.organizationsRepository.create({
+        name: 'Demo Fintech Company',
+        description: 'A sample fintech company for compliance demonstration',
+        website: 'https://demo-fintech.com',
+        industry: 'Financial Technology',
+      });
 
-    return this.organizationsRepository.save(organization);
+      const savedOrganization = await this.organizationsRepository.save(organization);
+      console.log('New organization created:', savedOrganization.id);
+      return savedOrganization;
+    } catch (error) {
+      console.error('Error creating organization:', error);
+      throw error;
+    }
   }
 
   private async createFrameworks(): Promise<Framework[]> {
@@ -116,6 +167,10 @@ export class SeederService {
   }
 
   private async createUsers(organization: Organization): Promise<User[]> {
+    if (!organization || !organization.id) {
+      throw new Error('Organization is undefined or missing id in createUsers');
+    }
+
     const usersData = [
       {
         email: 'admin@demo-fintech.com',
@@ -149,20 +204,28 @@ export class SeederService {
 
     const users: User[] = [];
     for (const userData of usersData) {
-      let user = await this.usersRepository.findOne({
-        where: { email: userData.email },
-      });
-
-      if (!user) {
-        const hashedPassword = await bcrypt.hash(userData.password, 10);
-        user = this.usersRepository.create({
-          ...userData,
-          password: hashedPassword,
-          organization,
+      try {
+        let user = await this.usersRepository.findOne({
+          where: { email: userData.email },
         });
-        user = await this.usersRepository.save(user);
+
+        if (!user) {
+          const hashedPassword = await bcrypt.hash(userData.password, 10);
+          user = this.usersRepository.create({
+            ...userData,
+            password: hashedPassword,
+            organization,
+          });
+          user = await this.usersRepository.save(user);
+          console.log(`Created user: ${user.email} with id: ${user.id}`);
+        } else {
+          console.log(`User already exists: ${user.email} with id: ${user.id}`);
+        }
+        users.push(user);
+      } catch (error) {
+        console.error(`Error creating user ${userData.email}:`, error);
+        throw error;
       }
-      users.push(user);
     }
 
     return users;
@@ -174,7 +237,20 @@ export class SeederService {
   ): Promise<ComplianceProgress[]> {
     const progressRecords: ComplianceProgress[] = [];
 
+    if (!organization || !organization.id) {
+      throw new Error('Organization is undefined or missing id');
+    }
+
+    if (!frameworks || frameworks.length === 0) {
+      throw new Error('Frameworks array is empty or undefined');
+    }
+
     for (const framework of frameworks) {
+      if (!framework || !framework.id) {
+        console.error('Framework is undefined or missing id:', framework);
+        continue;
+      }
+
       let progress = await this.progressRepository.findOne({
         where: { 
           organization: { id: organization.id },

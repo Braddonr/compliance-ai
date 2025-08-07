@@ -1,6 +1,8 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { SeederService } from "./seeder.service";
+import { SimpleSeederService } from "./simple-seeder.service";
+import { TestEntitiesService } from "./test-entities.service";
 import { DatabaseController } from "./database.controller";
 import { User } from "../users/entities/user.entity";
 import { Organization } from "../users/entities/organization.entity";
@@ -25,7 +27,7 @@ import { Comment } from "../collaboration/entities/comment.entity";
     ]),
   ],
   controllers: [DatabaseController],
-  providers: [SeederService],
-  exports: [SeederService],
+  providers: [SeederService, SimpleSeederService, TestEntitiesService],
+  exports: [SeederService, SimpleSeederService, TestEntitiesService],
 })
 export class DatabaseModule {}

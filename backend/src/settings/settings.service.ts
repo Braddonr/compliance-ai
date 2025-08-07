@@ -137,7 +137,7 @@ export class SettingsService {
       },
       {
         key: 'ai_model',
-        value: 'gpt-4',
+        value: 'gpt-3.5-turbo',
         description: 'AI model to use for content generation',
         category: 'ai',
         type: 'string' as const,
