@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ComplianceModule } from './compliance/compliance.module';
@@ -25,10 +26,13 @@ import { SettingsModule } from './settings/settings.module';
       database: process.env.DB_NAME || 'compliance_ai',
       autoLoadEntities: true,
       synchronize: true, // Enable for initial deployment to create tables
+      logging: process.env.NODE_ENV === 'production' ? ['error'] : false,
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
       extra: {
         connectionLimit: 10,
       },
+      retryAttempts: 3,
+      retryDelay: 3000,
     }),
     AuthModule,
     UsersModule,
@@ -39,5 +43,6 @@ import { SettingsModule } from './settings/settings.module';
     DatabaseModule,
     SettingsModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}

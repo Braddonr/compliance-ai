@@ -6,7 +6,7 @@ services:
     region: oregon
     plan: free
     buildCommand: cd backend && npm install && npm run build
-    startCommand: cd backend && npm run start:prod:seed
+    startCommand: cd backend && npm run start:prod
     healthCheckPath: /
     envVars:
       - key: NODE_ENV
@@ -16,7 +16,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
-        value: https://compliance-ai-frontend.onrender.com
+        value: https://compliance-ai-1-3uf3.onrender.com
       - key: DB_HOST
         fromDatabase:
           name: compliance-ai-db
@@ -49,7 +49,7 @@ services:
     pullRequestPreviewsEnabled: false
     envVars:
       - key: VITE_API_URL
-        value: https://compliance-ai-backend.onrender.com
+        value: https://compliance-ai-80m0.onrender.com
 
 # PostgreSQL Database
 databases:
