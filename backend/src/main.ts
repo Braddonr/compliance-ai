@@ -8,27 +8,31 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Run database seeding in production
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === "production") {
     try {
-      console.log('🌱 Running database seeding...');
+      console.log("🌱 Running database seeding...");
       const seederService = app.get(SeederService);
       await seederService.seed();
-      console.log('✅ Database seeding completed successfully');
+      console.log("✅ Database seeding completed successfully");
     } catch (error) {
-      console.error('❌ Database seeding failed:', error);
+      console.error("❌ Database seeding failed:", error);
       // Don't exit in production, continue with startup
-      console.log('⚠️ Continuing with application startup despite seeding failure');
+      console.log(
+        "⚠️ Continuing with application startup despite seeding failure"
+      );
     }
   }
 
   // Enable CORS for frontend
+  const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    "https://compliance-ai-1-3uf3.onrender.com",
+    "http://localhost:5173",
+    "http://localhost:5174",
+  ].filter((origin): origin is string => Boolean(origin));
+
   app.enableCors({
-    origin: [
-      process.env.FRONTEND_URL,
-      "https://compliance-ai-1-3uf3.onrender.com",
-      "http://localhost:5173",
-      "http://localhost:5174"
-    ].filter(Boolean),
+    origin: allowedOrigins,
     credentials: true,
   });
 
@@ -43,9 +47,9 @@ async function bootstrap() {
 
   // Swagger API documentation
   const config = new DocumentBuilder()
-    .setTitle('Compliance Companion API')
-    .setDescription('AI-Powered Compliance Copilot API')
-    .setVersion('1.0')
+    .setTitle("Compliance Companion API")
+    .setDescription("AI-Powered Compliance Copilot API")
+    .setVersion("1.0")
     .addBearerAuth()
     .build();
 
