@@ -72,6 +72,16 @@ export class DatabaseController {
     return await this.stepByStepSeederService.testStep4ComplianceProgress();
   }
 
+  @Post("test-step5")
+  async testStep5() {
+    return await this.stepByStepSeederService.testStep5Tasks();
+  }
+
+  @Post("test-step6")
+  async testStep6() {
+    return await this.stepByStepSeederService.testStep6Documents();
+  }
+
   @Get("health")
   healthCheck() {
     return {

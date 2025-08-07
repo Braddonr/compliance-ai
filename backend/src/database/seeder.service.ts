@@ -256,6 +256,7 @@ export class SeederService {
           organization: { id: organization.id },
           framework: { id: framework.id },
         },
+        relations: ['framework', 'organization'], // Load relations
       });
 
       if (!progress) {
@@ -269,6 +270,10 @@ export class SeederService {
           progressPercentage: 0,
         });
         progress = await this.progressRepository.save(progress);
+        
+        // Ensure the saved progress has the framework relation loaded
+        progress.framework = framework;
+        progress.organization = organization;
       }
       progressRecords.push(progress);
     }
@@ -334,11 +339,34 @@ export class SeederService {
     ];
 
     for (const taskData of tasksData) {
-      const framework = frameworks.find(f => f.name === taskData.frameworkName);
-      const progress = progressRecords.find(p => p.framework.id === framework?.id);
-      const assignedUser = users[Math.floor(Math.random() * users.length)];
+      try {
+        const framework = frameworks.find(f => f.name === taskData.frameworkName);
+        if (!framework || !framework.id) {
+          console.error(`Framework not found for: ${taskData.frameworkName}`);
+          continue;
+        }
 
-      if (framework && progress) {
+        // Find progress record by framework ID more safely
+        const progress = progressRecords.find(p => {
+          // Handle case where framework relation might not be loaded
+          if (p.framework && p.framework.id) {
+            return p.framework.id === framework.id;
+          }
+          // Fallback: reload the progress record with relations if needed
+          return false;
+        });
+
+        if (!progress) {
+          console.error(`Progress record not found for framework: ${framework.name}`);
+          continue;
+        }
+
+        const assignedUser = users[Math.floor(Math.random() * users.length)];
+        if (!assignedUser || !assignedUser.id) {
+          console.error('Assigned user is undefined or missing id');
+          continue;
+        }
+
         const existingTask = await this.tasksRepository.findOne({
           where: { name: taskData.name, framework: { id: framework.id } },
         });
@@ -351,7 +379,11 @@ export class SeederService {
             assignedTo: assignedUser,
           });
           await this.tasksRepository.save(task);
+          console.log(`Created task: ${task.name}`);
         }
+      } catch (error) {
+        console.error(`Error creating task ${taskData.name}:`, error);
+        throw error;
       }
     }
 

@@ -69,6 +69,8 @@ async function runStepByStepTests() {
     { number: 2, name: 'Framework Creation' },
     { number: 3, name: 'User Creation' },
     { number: 4, name: 'ComplianceProgress Creation' },
+    { number: 5, name: 'Tasks Setup' },
+    { number: 6, name: 'Documents Setup' },
   ];
 
   const results = [];

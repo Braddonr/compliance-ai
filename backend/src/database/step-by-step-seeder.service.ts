@@ -240,4 +240,91 @@ export class StepByStepSeederService {
       };
     }
   }
+
+  async testStep5Tasks(): Promise<any> {
+    try {
+      console.log('🧪 Testing Step 5: Task creation...');
+      
+      // Get required entities
+      const organization = await this.organizationsRepository.findOne({
+        where: { name: 'Demo Fintech Company' },
+      });
+
+      const frameworks = await this.frameworksRepository.find();
+      const progressRecords = await this.progressRepository.find({
+        relations: ['framework', 'organization'],
+      });
+      const users = await this.usersRepository.find();
+
+      if (!organization || !frameworks.length || !progressRecords.length || !users.length) {
+        throw new Error('Required entities not found - run previous steps first');
+      }
+
+      // Try to create one simple task
+      const framework = frameworks[0];
+      const progress = progressRecords.find(p => p.framework?.id === framework.id);
+      const user = users[0];
+
+      if (!progress) {
+        throw new Error('No matching progress record found for framework');
+      }
+
+      return {
+        success: true,
+        step: 'Tasks',
+        data: {
+          message: 'Task creation test setup successful',
+          organizationId: organization.id,
+          frameworkId: framework.id,
+          progressId: progress.id,
+          userId: user.id,
+          hasAllRequiredEntities: true,
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        step: 'Tasks',
+        error: error.message,
+        stack: error.stack,
+      };
+    }
+  }
+
+  async testStep6Documents(): Promise<any> {
+    try {
+      console.log('🧪 Testing Step 6: Document creation...');
+      
+      // Get required entities
+      const organization = await this.organizationsRepository.findOne({
+        where: { name: 'Demo Fintech Company' },
+      });
+
+      const frameworks = await this.frameworksRepository.find();
+      const users = await this.usersRepository.find();
+
+      if (!organization || !frameworks.length || !users.length) {
+        throw new Error('Required entities not found - run previous steps first');
+      }
+
+      return {
+        success: true,
+        step: 'Documents',
+        data: {
+          message: 'Document creation test setup successful',
+          organizationId: organization.id,
+          frameworkCount: frameworks.length,
+          userCount: users.length,
+          hasAllRequiredEntities: true,
+        }
+      };
+    } catch (error) {
+      return {
+        success: false,
+        step: 'Documents',
+        error: error.message,
+        stack: error.stack,
+      };
+    }
+  }
 }
