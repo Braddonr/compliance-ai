@@ -2,13 +2,15 @@ import { Controller, Post, Get } from "@nestjs/common";
 import { SeederService } from "./seeder.service";
 import { SimpleSeederService } from "./simple-seeder.service";
 import { TestEntitiesService } from "./test-entities.service";
+import { StepByStepSeederService } from "./step-by-step-seeder.service";
 
 @Controller("database")
 export class DatabaseController {
   constructor(
     private readonly seederService: SeederService,
     private readonly simpleSeederService: SimpleSeederService,
-    private readonly testEntitiesService: TestEntitiesService
+    private readonly testEntitiesService: TestEntitiesService,
+    private readonly stepByStepSeederService: StepByStepSeederService
   ) {}
 
   @Post("seed")
@@ -48,6 +50,26 @@ export class DatabaseController {
   @Post("test-entities")
   async testEntities() {
     return await this.testEntitiesService.testCreateOrganization();
+  }
+
+  @Post("test-step1")
+  async testStep1() {
+    return await this.stepByStepSeederService.testStep1Organization();
+  }
+
+  @Post("test-step2")
+  async testStep2() {
+    return await this.stepByStepSeederService.testStep2Frameworks();
+  }
+
+  @Post("test-step3")
+  async testStep3() {
+    return await this.stepByStepSeederService.testStep3Users();
+  }
+
+  @Post("test-step4")
+  async testStep4() {
+    return await this.stepByStepSeederService.testStep4ComplianceProgress();
   }
 
   @Get("health")
