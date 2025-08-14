@@ -22,5 +22,25 @@ export default defineConfig({
   server: {
     // @ts-ignore
     allowedHosts: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => {
+          const newPath = path.replace(/^\/api/, '');
+          console.log(`🔄 Proxy: ${path} → ${newPath}`);
+          return newPath;
+        },
+        configure: (proxy, options) => {
+          proxy.on('error', (err, req, res) => {
+            console.log('❌ Proxy error:', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            console.log(`🌐 Proxying: ${req.method} ${req.url} → http://localhost:3000${proxyReq.path}`);
+          });
+        },
+      },
+    },
   }
 });

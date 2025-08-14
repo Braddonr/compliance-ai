@@ -23,7 +23,7 @@ async function bootstrap() {
     }
   }
 
-  // Enable CORS for frontend
+  // Enable CORS for frontend with debugging
   const allowedOrigins = [
     process.env.FRONTEND_URL,
     "http://localhost:5173",
@@ -31,11 +31,28 @@ async function bootstrap() {
     "https://compliance-ai-1-3uf3.onrender.com",
   ].filter((origin): origin is string => Boolean(origin));
 
+  console.log("🔧 CORS allowed origins:", allowedOrigins);
+
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      console.log("🌐 CORS request from origin:", origin);
+      
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin)) {
+        console.log("✅ CORS origin allowed:", origin);
+        return callback(null, true);
+      } else {
+        console.log("❌ CORS origin blocked:", origin);
+        return callback(new Error("Not allowed by CORS"), false);
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
 
   // Global validation pipe
