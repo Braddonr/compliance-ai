@@ -3,6 +3,14 @@ import toast from "react-hot-toast";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+// Debug environment variables in development
+if (import.meta.env.DEV) {
+  console.log("🔧 Frontend Environment Variables:");
+  console.log("VITE_API_URL:", import.meta.env.VITE_API_URL);
+  console.log("API_BASE_URL:", API_BASE_URL);
+  console.log("All VITE_ vars:", Object.keys(import.meta.env).filter(key => key.startsWith('VITE_')));
+}
+
 // Create axios instance
 export const api = axios.create({
   baseURL: API_BASE_URL,

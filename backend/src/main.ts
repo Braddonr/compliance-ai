@@ -25,9 +25,7 @@ async function bootstrap() {
 
   // Enable CORS for frontend with debugging
   const allowedOrigins = [
-    process.env.FRONTEND_URL,
-    "http://localhost:5173",
-    "http://localhost:5174",
+    process.env.FRONTEND_URL || "http://localhost:5173",
     "https://compliance-ai-1-3uf3.onrender.com",
   ].filter((origin): origin is string => Boolean(origin));
 
@@ -76,10 +74,12 @@ async function bootstrap() {
   SwaggerModule.setup("api/docs", app, document);
 
   const port = process.env.PORT || 3000;
-  await app.listen(port);
+  const host = 'localhost';
+  
+  await app.listen(port, '0.0.0.0'); // Listen on all interfaces
 
-  console.log(`🚀 Application is running on: http://localhost:${port}`);
-  console.log(`📚 API Documentation: http://localhost:${port}/api/docs`);
+  console.log(`🚀 Application is running on: http://${host}:${port}`);
+  console.log(`📚 API Documentation: http://${host}:${port}/api/docs`);
 }
 
 bootstrap();
