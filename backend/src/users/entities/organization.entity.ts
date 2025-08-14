@@ -5,13 +5,14 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-} from 'typeorm';
-import { User } from './user.entity';
-import { Document } from '../../documents/entities/document.entity';
+} from "typeorm";
+import { User } from "./user.entity";
+import { Document } from "../../documents/entities/document.entity";
+import { ComplianceProgress } from "../../compliance/entities/compliance-progress.entity";
 
-@Entity('organizations')
+@Entity("organizations")
 export class Organization {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column({ unique: true })
@@ -34,6 +35,9 @@ export class Organization {
 
   @OneToMany(() => Document, (document) => document.organization)
   documents: Document[];
+
+  @OneToMany(() => ComplianceProgress, (progress) => progress.organization)
+  complianceProgress: ComplianceProgress[];
 
   @CreateDateColumn()
   createdAt: Date;

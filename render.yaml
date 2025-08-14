@@ -1,0 +1,60 @@
+services:
+  # Backend API Service
+  - type: web
+    name: compliance-ai-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm run start:prod
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://compliance-ai-1-3uf3.onrender.com
+      - key: DB_HOST
+        fromDatabase:
+          name: compliance-ai-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: compliance-ai-db
+          property: port
+      - key: DB_USERNAME
+        fromDatabase:
+          name: compliance-ai-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: compliance-ai-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: compliance-ai-db
+          property: database
+
+  # Frontend Static Site
+  - type: web
+    name: compliance-ai-frontend
+    env: static
+    region: oregon
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    pullRequestPreviewsEnabled: false
+    envVars:
+      - key: VITE_API_URL
+        value: https://compliance-ai-80m0.onrender.com
+
+# PostgreSQL Database
+databases:
+  - name: compliance-ai-db
+    databaseName: compliance_ai
+    user: compliance_user
+    region: oregon
+    plan: free

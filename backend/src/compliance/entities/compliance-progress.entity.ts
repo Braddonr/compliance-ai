@@ -19,7 +19,7 @@ export class ComplianceProgress {
   @ManyToOne(() => Framework, (framework) => framework.progress)
   framework: Framework;
 
-  @ManyToOne(() => Organization, (organization) => organization.documents)
+  @ManyToOne(() => Organization, (organization) => organization.complianceProgress)
   organization: Organization;
 
   @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })

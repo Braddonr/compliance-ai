@@ -30,7 +30,7 @@ export class AiService {
 
       // Get AI settings from database
       const aiSettings = await this.settingsService.getAISettings();
-      const model = aiSettings.ai_model || "gpt-4";
+      const model = aiSettings.ai_model || "gpt-3.5-turbo";
       const temperature = aiSettings.ai_temperature || 0.3;
       const maxTokens = aiSettings.ai_max_tokens || 4000;
 
@@ -646,7 +646,7 @@ ${requirements
       const prompt = this.buildReportPrompt(reportData);
 
       const completion = await this.openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: [
           {
             role: "system",
@@ -824,7 +824,7 @@ Provide specific gaps, recommendations, and priority levels for addressing them.
       `;
 
       const completion = await this.openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: [
           {
             role: "system",
