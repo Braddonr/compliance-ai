@@ -92,6 +92,16 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
     queryFn: complianceAPI.getFrameworks,
   });
 
+  // Debug frameworks data
+  React.useEffect(() => {
+    if (frameworks) {
+      console.log('🔧 Frameworks loaded:', frameworks);
+      frameworks.forEach((framework: any) => {
+        console.log(`Framework: ${framework.name} | DisplayName: "${framework.displayName}" | ID: ${framework.id}`);
+      });
+    }
+  }, [frameworks]);
+
   // Fetch company context from settings
   const { data: companyContext } = useQuery({
     queryKey: ['settings', 'company-context'],
@@ -255,7 +265,7 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
       'Data Breach Procedures',
       'Privacy by Design',
     ],
-    'ISO27001': [
+    'ISO 27001': [
       'Information Security Policy',
       'Risk Management',
       'Asset Management',
@@ -486,6 +496,21 @@ const CreateDocumentModal: React.FC<CreateDocumentModalProps> = ({
                           <div className="space-y-4">
                             <div>
                               <Label className="text-sm font-medium">Common Requirements</Label>
+                              {/* Debug logging */}
+                              {(() => {
+                                const selectedFramework = frameworks?.find(f => f.id === watchedFramework);
+                                const displayName = selectedFramework?.displayName;
+                                const requirements = commonRequirements[displayName as keyof typeof commonRequirements];
+                                
+                                console.log('🔧 CreateDocumentModal Debug:');
+                                console.log('watchedFramework:', watchedFramework);
+                                console.log('selectedFramework:', selectedFramework);
+                                console.log('displayName:', displayName);
+                                console.log('commonRequirements keys:', Object.keys(commonRequirements));
+                                console.log('requirements for', displayName, ':', requirements);
+                                
+                                return null;
+                              })()}
                               <div className="flex flex-wrap gap-2 mt-2">
                                 {commonRequirements[frameworks?.find(f => f.id === watchedFramework)?.displayName as keyof typeof commonRequirements]?.map((req) => (
                                   <Badge
