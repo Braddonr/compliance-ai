@@ -7,6 +7,15 @@ import { SeederService } from "./database/seeder.service";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Debug environment variables loading
+  console.log('🔧 Backend Environment Variables:');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('PORT:', process.env.PORT);
+  console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY ? 'LOADED ✅' : 'MISSING ❌');
+  console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'LOADED ✅' : 'MISSING ❌');
+  console.log('DB_HOST:', process.env.DB_HOST);
+  console.log('FRONTEND_URL:', process.env.FRONTEND_URL);
+
   // Run database seeding in production
   if (process.env.NODE_ENV === "production") {
     try {
