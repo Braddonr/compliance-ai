@@ -15,7 +15,7 @@ import { SettingsModule } from './settings/settings.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '../.env', // Load from root directory
+      // Don't specify envFilePath in production - Railway provides env vars directly
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
