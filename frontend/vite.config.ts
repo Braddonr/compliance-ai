@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, path.resolve(__dirname, '../'), '');
   
   return {
-    base: env.NODE_ENV === "development" ? "/" : env.VITE_BASE_PATH || "/",
+    base: "/",
     envDir: path.resolve(__dirname, '../'), // Tell Vite where to find .env files
     optimizeDeps: {
       entries: ["src/main.tsx", "src/tempobook/**/*"],

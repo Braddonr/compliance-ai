@@ -38,20 +38,16 @@ services:
           name: compliance-ai-db
           property: database
 
-  # Frontend Node.js Service (for SPA routing)
+  # Frontend Static Site (with HashRouter for SPA routing)
   - type: web
     name: compliance-ai-frontend
-    env: node
+    env: static
     region: oregon
     plan: free
     buildCommand: cd frontend && npm install && npm run build
-    startCommand: cd frontend && npm start
-    healthCheckPath: /
+    staticPublishPath: frontend/dist
+    pullRequestPreviewsEnabled: false
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 10000
       - key: VITE_API_URL
         value: https://compliance-ai-80m0.onrender.com
 
