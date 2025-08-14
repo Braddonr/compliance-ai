@@ -627,6 +627,26 @@ ${requirements
         "Implement controls for identifying, classifying, and protecting organizational assets.",
       "Incident Management":
         "Establish procedures for detecting, responding to, and recovering from security incidents.",
+      "Information Security Policy":
+        "Develop and maintain comprehensive information security policies and procedures aligned with business objectives.",
+      "Access Control":
+        "Implement robust access control mechanisms including user authentication, authorization, and privilege management.",
+      "Business Continuity":
+        "Establish business continuity and disaster recovery procedures to ensure operational resilience.",
+      "Confidentiality Controls":
+        "Implement controls to protect the confidentiality of sensitive information and data.",
+      "Privacy Controls":
+        "Establish privacy protection measures and controls for personal data processing.",
+      "Consent Management":
+        "Implement systems and procedures for managing data subject consent and preferences.",
+      "Data Breach Procedures":
+        "Establish procedures for detecting, reporting, and responding to personal data breaches.",
+      "Privacy by Design":
+        "Implement privacy-by-design principles in system development and data processing activities.",
+      "Network Monitoring":
+        "Implement continuous network monitoring and intrusion detection systems.",
+      "Security Testing":
+        "Conduct regular security testing including vulnerability assessments and penetration testing.",
     };
 
     return (

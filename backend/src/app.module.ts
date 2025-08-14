@@ -15,6 +15,7 @@ import { SettingsModule } from './settings/settings.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '../.env', // Load from root directory
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',

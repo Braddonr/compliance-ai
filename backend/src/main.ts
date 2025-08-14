@@ -23,17 +23,34 @@ async function bootstrap() {
     }
   }
 
-  // Enable CORS for frontend
+  // Enable CORS for frontend with debugging
   const allowedOrigins = [
-    process.env.FRONTEND_URL,
+    process.env.FRONTEND_URL || "http://localhost:5173",
     "https://compliance-ai-1-3uf3.onrender.com",
-    "http://localhost:5173",
-    "http://localhost:5174",
   ].filter((origin): origin is string => Boolean(origin));
 
+  console.log("🔧 CORS allowed origins:", allowedOrigins);
+
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      console.log("🌐 CORS request from origin:", origin);
+      
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin)) {
+        console.log("✅ CORS origin allowed:", origin);
+        return callback(null, true);
+      } else {
+        console.log("❌ CORS origin blocked:", origin);
+        return callback(new Error("Not allowed by CORS"), false);
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
 
   // Global validation pipe
@@ -57,10 +74,12 @@ async function bootstrap() {
   SwaggerModule.setup("api/docs", app, document);
 
   const port = process.env.PORT || 3000;
-  await app.listen(port);
+  const host = 'localhost';
+  
+  await app.listen(port, '0.0.0.0'); // Listen on all interfaces
 
-  console.log(`🚀 Application is running on: http://localhost:${port}`);
-  console.log(`📚 API Documentation: http://localhost:${port}/api/docs`);
+  console.log(`🚀 Application is running on: http://${host}:${port}`);
+  console.log(`📚 API Documentation: http://${host}:${port}/api/docs`);
 }
 
 bootstrap();
