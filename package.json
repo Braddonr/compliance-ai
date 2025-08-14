@@ -1,0 +1,35 @@
+{
+  "name": "compliance-ai",
+  "version": "1.0.0",
+  "description": "AI-Powered Compliance Copilot - Full Stack Application",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm run test",
+    "test:frontend": "cd frontend && npm run test",
+    "seed": "cd backend && npm run seed",
+    "seed:simple": "node test-simple-seeding.js",
+    "test:api": "node test-backend-api.js",
+    "test:steps": "node test-steps.js",
+    "clean": "rm -rf backend/dist frontend/dist backend/node_modules frontend/node_modules node_modules",
+    "setup": "npm run install:all && npm run seed:simple"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "compliance",
+    "ai",
+    "nestjs",
+    "react",
+    "typescript"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
